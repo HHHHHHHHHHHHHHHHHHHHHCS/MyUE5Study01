@@ -3,13 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
 class MYUE5STUDY01_API AMyCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Components")
+	USpringArmComponent* springArmComp;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Components")
+	UCameraComponent* cameraComp;
 
 public:
 	// Sets default values for this character's properties
