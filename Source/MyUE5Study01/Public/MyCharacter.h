@@ -32,6 +32,10 @@ protected:
 
 	virtual void MoveRight(float val);
 
+	virtual void BeginCrouch();
+
+	virtual void EndCrouch();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
