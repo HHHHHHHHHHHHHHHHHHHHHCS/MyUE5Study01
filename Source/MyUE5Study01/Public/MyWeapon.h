@@ -15,6 +15,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	USkeletalMeshComponent* skMeshComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	TSubclassOf<UDamageType> damageType;
+
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();
