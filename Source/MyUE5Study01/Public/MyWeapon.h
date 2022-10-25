@@ -18,6 +18,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	TSubclassOf<UDamageType> damageType;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	UParticleSystem* muzzleEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	FName muzzleSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	UParticleSystem* impactEffect;
+	
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();

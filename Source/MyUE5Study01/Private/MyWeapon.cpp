@@ -48,8 +48,17 @@ void AMyWeapon::Fire()
 			//射线检测成功
 			AActor* hitActor = hit.GetActor();
 			UGameplayStatics::ApplyPointDamage(hitActor, 20.0f, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
+			if (impactEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactEffect, hit.ImpactPoint, hit.ImpactNormal.Rotation());
+			}
 		}
 
 		DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
+
+		if (muzzleEffect)
+		{
+			UGameplayStatics::SpawnEmitterAttached(muzzleEffect, skMeshComp, muzzleSocketName);
+		}
 	}
 }
