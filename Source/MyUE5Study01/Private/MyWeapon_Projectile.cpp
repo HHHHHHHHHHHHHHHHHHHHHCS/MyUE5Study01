@@ -16,6 +16,6 @@ void AMyWeapon_Projectile::Fire()
 
 		FActorSpawnParameters spawnParams;
 		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		GetWorld()->SpawnActor<AMyWeapon_Projectile>(projectileCls, muzzleLocation, eyeRotation, spawnParams);
+		GetWorld()->SpawnActor<AActor>(projectileCls, muzzleLocation, eyeRotation, spawnParams);
 	}
 }
