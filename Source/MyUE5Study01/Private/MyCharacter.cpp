@@ -19,12 +19,16 @@ AMyCharacter::AMyCharacter()
 	cameraComp->SetupAttachment(springArmComp);
 
 	ACharacter::GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	zoomFOVScale = 2.0f;
 }
 
 // Called when the game starts or when spawned
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	defaultFOV = cameraComp->FieldOfView;
 }
 
 void AMyCharacter::MoveForward(float val)
@@ -51,6 +55,9 @@ void AMyCharacter::EndCrouch()
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	float currFov = bWantsToZoom ? defaultFOV / zoomFOVScale : defaultFOV;
+	cameraComp->FieldOfView = FMath::Lerp(cameraComp->FieldOfView, currFov, 0.33f);
 }
 
 // Called to bind functionality to input
@@ -64,13 +71,26 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AMyCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AMyCharacter::EndCrouch);
+
+	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AMyCharacter::BeginZoomFOV);
+	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AMyCharacter::EndZoomFOV);
 }
 
 FVector AMyCharacter::GetPawnViewLocation() const
 {
-	if(cameraComp)
+	if (cameraComp)
 	{
 		return cameraComp->GetComponentLocation();
 	}
 	return Super::GetPawnViewLocation();
+}
+
+void AMyCharacter::BeginZoomFOV()
+{
+	bWantsToZoom = true;
+}
+
+void AMyCharacter::EndZoomFOV()
+{
+	bWantsToZoom = false;
 }

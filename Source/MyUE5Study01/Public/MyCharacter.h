@@ -14,12 +14,19 @@ class MYUE5STUDY01_API AMyCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	USpringArmComponent* springArmComp;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category="Components")
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UCameraComponent* cameraComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+	float zoomFOVScale;
+
+private:
+	bool bWantsToZoom;
+
+	float defaultFOV;
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();
@@ -41,7 +48,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent( UInputComponent* PlayerInputComponent) override;
 
 	virtual FVector GetPawnViewLocation() const override;
+
+private:
+	void BeginZoomFOV();
+
+	void EndZoomFOV();
 };
