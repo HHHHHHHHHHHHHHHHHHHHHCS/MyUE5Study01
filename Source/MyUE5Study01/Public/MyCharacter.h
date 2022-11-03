@@ -23,6 +23,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
 	float zoomFOVScale;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta=(ClampMin = 0.001, ClampMax = 0.999))
+	float fovSpeed;
+
+	
 private:
 	bool bWantsToZoom;
 

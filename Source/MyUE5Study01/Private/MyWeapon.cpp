@@ -5,6 +5,9 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
+static int k_debugWeaponDrawing = 0;
+FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,TEXT("Draw debug weapon line."), ECVF_Cheat);
+
 // Sets default values
 AMyWeapon::AMyWeapon()
 {
@@ -54,7 +57,10 @@ void AMyWeapon::Fire()
 			}
 		}
 
-		DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
+		if (k_debugWeaponDrawing != 0)
+		{
+			DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
+		}
 
 		if (muzzleEffect)
 		{

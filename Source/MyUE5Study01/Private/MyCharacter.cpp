@@ -21,6 +21,7 @@ AMyCharacter::AMyCharacter()
 	ACharacter::GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	zoomFOVScale = 2.0f;
+	fovSpeed = 0.25f;
 }
 
 // Called when the game starts or when spawned
@@ -56,8 +57,8 @@ void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	float currFov = bWantsToZoom ? defaultFOV / zoomFOVScale : defaultFOV;
-	cameraComp->FieldOfView = FMath::Lerp(cameraComp->FieldOfView, currFov, 0.33f);
+	float targetFOV = bWantsToZoom ? defaultFOV / zoomFOVScale : defaultFOV;
+	cameraComp->SetFieldOfView(FMath::Lerp(cameraComp->FieldOfView, targetFOV, fovSpeed));
 }
 
 // Called to bind functionality to input
