@@ -4,6 +4,7 @@
 #include "MyWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 static int k_debugWeaponDrawing = 0;
 FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,TEXT("Draw debug weapon line."), ECVF_Cheat);
@@ -11,22 +12,9 @@ FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debug
 // Sets default values
 AMyWeapon::AMyWeapon()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 	skMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkMeshComp"));
 	SetRootComponent(skMeshComp);
-}
-
-// Called when the game starts or when spawned
-void AMyWeapon::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
-void AMyWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	traceEndName = "BeamEnd";
 }
 
 void AMyWeapon::Fire()
@@ -45,16 +33,19 @@ void AMyWeapon::Fire()
 		params.AddIgnoredActor(this);
 		params.bTraceComplex = true;
 
+		FVector traceEndPoint = traceEnd;
 		FHitResult hit;
 		if (GetWorld()->LineTraceSingleByChannel(hit, eyeLocation, traceEnd, ECC_Visibility, params))
 		{
 			//射线检测成功
 			AActor* hitActor = hit.GetActor();
 			UGameplayStatics::ApplyPointDamage(hitActor, 20.0f, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
+			//击中特效
 			if (impactEffect)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactEffect, hit.ImpactPoint, hit.ImpactNormal.Rotation());
 			}
+			traceEndPoint = hit.ImpactPoint;
 		}
 
 		if (k_debugWeaponDrawing != 0)
@@ -62,9 +53,24 @@ void AMyWeapon::Fire()
 			DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
 		}
 
+		//开火特效
 		if (muzzleEffect)
 		{
 			UGameplayStatics::SpawnEmitterAttached(muzzleEffect, skMeshComp, muzzleSocketName);
 		}
+		//创建发射特效
+		if (traceEffect)
+		{
+			FVector muzzleLocation = skMeshComp->GetSocketLocation(muzzleSocketName);
+			UParticleSystemComponent* traceComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), traceEffect, muzzleLocation);
+			if (traceComp)
+			{
+				traceComp->SetVectorParameter(traceEndName, traceEndPoint);
+			}
+		}
 	}
+}
+
+void AMyWeapon::PlayFireEffect()
+{
 }
