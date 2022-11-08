@@ -22,6 +22,9 @@ AMyCharacter::AMyCharacter()
 
 	zoomFOVScale = 2.0f;
 	fovSpeed = 0.25f;
+
+	weaponAttachSocketName = "MyWeaponSocket";
+
 }
 
 // Called when the game starts or when spawned
@@ -30,6 +33,16 @@ void AMyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	defaultFOV = cameraComp->FieldOfView;
+
+	
+	if (defaultWeaponCls)
+	{
+		FActorSpawnParameters spawnParams;
+		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
+		currWeapon->SetOwner(this);
+		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
+	}
 }
 
 void AMyCharacter::MoveForward(float val)
@@ -75,6 +88,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AMyCharacter::BeginZoomFOV);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AMyCharacter::EndZoomFOV);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyCharacter::Fire);
 }
 
 FVector AMyCharacter::GetPawnViewLocation() const
@@ -84,6 +99,14 @@ FVector AMyCharacter::GetPawnViewLocation() const
 		return cameraComp->GetComponentLocation();
 	}
 	return Super::GetPawnViewLocation();
+}
+
+void AMyCharacter::Fire()
+{
+	if (currWeapon)
+	{
+		currWeapon->Fire();
+	}
 }
 
 void AMyCharacter::BeginZoomFOV()

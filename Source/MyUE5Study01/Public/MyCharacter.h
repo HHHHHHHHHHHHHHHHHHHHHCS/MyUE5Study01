@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyWeapon.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -26,11 +27,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components", meta=(ClampMin = 0.001, ClampMax = 0.999))
 	float fovSpeed;
 
-	
+	// 默认生成的武器
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	TSubclassOf<AMyWeapon> defaultWeaponCls;
+
+	// 默认生成的武器的插槽名字
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	FName weaponAttachSocketName;
+
 private:
 	bool bWantsToZoom;
 
 	float defaultFOV;
+
+	AMyWeapon* currWeapon;
+
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();
@@ -52,9 +63,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent( UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	virtual FVector GetPawnViewLocation() const override;
+
+	void Fire();
 
 private:
 	void BeginZoomFOV();

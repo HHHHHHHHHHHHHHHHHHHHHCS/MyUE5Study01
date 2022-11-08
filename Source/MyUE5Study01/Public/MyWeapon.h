@@ -33,7 +33,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	FName traceEndName;
 
-
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();
@@ -43,5 +42,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	virtual void Fire();
 
-	virtual void PlayFireEffect();
+	virtual void PlayFireEffect(FVector traceEndPoint);
 };
