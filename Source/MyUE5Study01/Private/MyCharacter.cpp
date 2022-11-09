@@ -3,6 +3,7 @@
 
 #include "MyCharacter.h"
 
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
 
 // Sets default values
@@ -42,6 +43,12 @@ void AMyCharacter::BeginPlay()
 		currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
 		currWeapon->SetOwner(this);
 		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
+	}
+
+	if(uiCrosshairsCls)
+	{
+		UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
+		widget->AddToViewport();
 	}
 }
 

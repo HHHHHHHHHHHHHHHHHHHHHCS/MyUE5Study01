@@ -35,6 +35,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	FName weaponAttachSocketName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	TSubclassOf<UUserWidget> uiCrosshairsCls;
+
 private:
 	bool bWantsToZoom;
 
