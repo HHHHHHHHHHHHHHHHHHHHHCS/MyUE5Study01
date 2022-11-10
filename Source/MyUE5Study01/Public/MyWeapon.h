@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	FName traceEndName;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	TSubclassOf<UCameraShakeBase> fireCameraShake;
+	
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();

@@ -57,6 +57,7 @@ void AMyWeapon::Fire()
 	}
 }
 
+// 播放开火相关特效
 void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 {
 	//开火特效
@@ -72,6 +73,16 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 		if (traceComp)
 		{
 			traceComp->SetVectorParameter(traceEndName, traceEndPoint);
+		}
+	}
+
+	APawn* myOwner = Cast<APawn>(GetOwner());
+	if (myOwner)
+	{
+		APlayerController* pc = Cast<APlayerController>(myOwner->GetInstigatorController());
+		if(pc)
+		{
+			pc->ClientStartCameraShake(fireCameraShake);
 		}
 	}
 }
