@@ -25,9 +25,6 @@ public:
 	FName muzzleSocketName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
-	UParticleSystem* impactEffect;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	UParticleSystem* traceEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
@@ -35,7 +32,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	TSubclassOf<UCameraShakeBase> fireCameraShake;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	UParticleSystem* defaultImpactEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
+	UParticleSystem* fleshImpactEffect;
+
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();

@@ -4,7 +4,9 @@
 #include "MyWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "MyUE5Study01/MyUE5Study01.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 static int k_debugWeaponDrawing = 0;
 FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,TEXT("Draw debug weapon line."), ECVF_Cheat);
@@ -32,6 +34,7 @@ void AMyWeapon::Fire()
 		params.AddIgnoredActor(myOwner);
 		params.AddIgnoredActor(this);
 		params.bTraceComplex = true;
+		params.bReturnPhysicalMaterial = true;
 
 		FVector traceEndPoint = traceEnd;
 		FHitResult hit;
@@ -40,10 +43,25 @@ void AMyWeapon::Fire()
 			//射线检测成功
 			AActor* hitActor = hit.GetActor();
 			UGameplayStatics::ApplyPointDamage(hitActor, 20.0f, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
-			//击中特效
-			if (impactEffect)
+			EPhysicalSurface surfaceType = UPhysicalMaterial::DetermineSurfaceType(hit.PhysMaterial.Get());
+			UParticleSystem* selectEffect = nullptr;
+			switch (surfaceType)
 			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactEffect, hit.ImpactPoint, hit.ImpactNormal.Rotation());
+			case SURFACE_FLESH_DEFAULT:
+			case SURFACE_FLESH_VULNERABLE:
+				{
+					selectEffect = fleshImpactEffect;
+					break;
+				}
+			default:
+				{
+					selectEffect = defaultImpactEffect;
+					break;
+				}
+			}
+			if (selectEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), selectEffect, hit.ImpactPoint, hit.ImpactNormal.Rotation());
 			}
 			traceEndPoint = hit.ImpactPoint;
 		}
@@ -80,7 +98,7 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 	if (myOwner)
 	{
 		APlayerController* pc = Cast<APlayerController>(myOwner->GetInstigatorController());
-		if(pc)
+		if (pc)
 		{
 			pc->ClientStartCameraShake(fireCameraShake);
 		}
