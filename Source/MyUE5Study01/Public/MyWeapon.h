@@ -39,14 +39,24 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Weapon")
 	UParticleSystem* fleshImpactEffect;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon")
+	float baseDamage;
+
+
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();
 
 protected:
+	FTimerHandle timerHandle_TimeBetweenShots;
+
 public:
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	virtual void Fire();
 
 	virtual void PlayFireEffect(FVector traceEndPoint);
+
+	virtual void StartFire();
+
+	virtual void StopFire();
 };

@@ -17,6 +17,7 @@ AMyWeapon::AMyWeapon()
 	skMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkMeshComp"));
 	SetRootComponent(skMeshComp);
 	traceEndName = "BeamEnd";
+	baseDamage = 20;
 }
 
 void AMyWeapon::Fire()
@@ -38,19 +39,25 @@ void AMyWeapon::Fire()
 
 		FVector traceEndPoint = traceEnd;
 		FHitResult hit;
-		if (GetWorld()->LineTraceSingleByChannel(hit, eyeLocation, traceEnd, ECC_Visibility, params))
+		if (GetWorld()->LineTraceSingleByChannel(hit, eyeLocation, traceEnd, COLLISION_WEAPON, params))
 		{
 			//射线检测成功
 			AActor* hitActor = hit.GetActor();
-			UGameplayStatics::ApplyPointDamage(hitActor, 20.0f, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
 			EPhysicalSurface surfaceType = UPhysicalMaterial::DetermineSurfaceType(hit.PhysMaterial.Get());
+			float damage = 0;
 			UParticleSystem* selectEffect = nullptr;
 			switch (surfaceType)
 			{
 			case SURFACE_FLESH_DEFAULT:
+				{
+					selectEffect = fleshImpactEffect;
+					damage = baseDamage;
+					break;
+				}
 			case SURFACE_FLESH_VULNERABLE:
 				{
 					selectEffect = fleshImpactEffect;
+					damage = baseDamage * 5;
 					break;
 				}
 			default:
@@ -59,6 +66,8 @@ void AMyWeapon::Fire()
 					break;
 				}
 			}
+			UGameplayStatics::ApplyPointDamage(hitActor, damage, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
+
 			if (selectEffect)
 			{
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), selectEffect, hit.ImpactPoint, hit.ImpactNormal.Rotation());
@@ -103,4 +112,14 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 			pc->ClientStartCameraShake(fireCameraShake);
 		}
 	}
+}
+
+void AMyWeapon::StartFire()
+{
+	GetWorldTimerManager().SetTimer(timerHandle_TimeBetweenShots, this, &AMyWeapon::Fire,1.0f, true);
+}
+
+void AMyWeapon::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(timerHandle_TimeBetweenShots);
 }
