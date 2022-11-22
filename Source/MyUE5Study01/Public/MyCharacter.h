@@ -70,8 +70,10 @@ public:
 
 	virtual FVector GetPawnViewLocation() const override;
 
-	void Fire();
+	void StartFire();
 
+	void StopFire();
+	
 private:
 	void BeginZoomFOV();
 

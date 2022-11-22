@@ -42,6 +42,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon")
 	float baseDamage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon")
+	float rateOfFire;
 
 public:
 	// Sets default values for this actor's properties
@@ -50,7 +52,13 @@ public:
 protected:
 	FTimerHandle timerHandle_TimeBetweenShots;
 
+	float lastFiredTime;
+
+	float timeBetweenShots;
+
 public:
+	virtual void BeginPlay() override;
+
 	UFUNCTION(BlueprintCallable, Category="Weapon")
 	virtual void Fire();
 

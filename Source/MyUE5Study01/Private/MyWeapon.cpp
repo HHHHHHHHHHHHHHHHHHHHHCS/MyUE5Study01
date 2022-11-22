@@ -18,6 +18,13 @@ AMyWeapon::AMyWeapon()
 	SetRootComponent(skMeshComp);
 	traceEndName = "BeamEnd";
 	baseDamage = 20;
+	rateOfFire = 10.0f;
+}
+
+void AMyWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+	timeBetweenShots = 1.0f / rateOfFire;
 }
 
 void AMyWeapon::Fire()
@@ -112,11 +119,13 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 			pc->ClientStartCameraShake(fireCameraShake);
 		}
 	}
+
+	lastFiredTime = GetWorld()->TimeSeconds;
 }
 
 void AMyWeapon::StartFire()
 {
-	GetWorldTimerManager().SetTimer(timerHandle_TimeBetweenShots, this, &AMyWeapon::Fire,1.0f, true);
+	GetWorldTimerManager().SetTimer(timerHandle_TimeBetweenShots, this, &AMyWeapon::Fire, timeBetweenShots, true, 0.0f);
 }
 
 void AMyWeapon::StopFire()

@@ -25,7 +25,6 @@ AMyCharacter::AMyCharacter()
 	fovSpeed = 0.25f;
 
 	weaponAttachSocketName = "MyWeaponSocket";
-
 }
 
 // Called when the game starts or when spawned
@@ -35,7 +34,7 @@ void AMyCharacter::BeginPlay()
 
 	defaultFOV = cameraComp->FieldOfView;
 
-	
+
 	if (defaultWeaponCls)
 	{
 		FActorSpawnParameters spawnParams;
@@ -45,7 +44,7 @@ void AMyCharacter::BeginPlay()
 		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
 	}
 
-	if(uiCrosshairsCls)
+	if (uiCrosshairsCls)
 	{
 		UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
 		widget->AddToViewport();
@@ -96,7 +95,8 @@ void AMyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AMyCharacter::BeginZoomFOV);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AMyCharacter::EndZoomFOV);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AMyCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AMyCharacter::StopFire);
 }
 
 FVector AMyCharacter::GetPawnViewLocation() const
@@ -108,11 +108,19 @@ FVector AMyCharacter::GetPawnViewLocation() const
 	return Super::GetPawnViewLocation();
 }
 
-void AMyCharacter::Fire()
+void AMyCharacter::StartFire()
 {
 	if (currWeapon)
 	{
-		currWeapon->Fire();
+		currWeapon->StartFire();
+	}
+}
+
+void AMyCharacter::StopFire()
+{
+	if (currWeapon)
+	{
+		currWeapon->StopFire();
 	}
 }
 
