@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyHealthComponent.h"
 #include "MyWeapon.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -38,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	TSubclassOf<UUserWidget> uiCrosshairsCls;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category="Player")
+	UMyHealthComponent* healthComp;
+	
 private:
 	bool bWantsToZoom;
 

@@ -70,6 +70,7 @@ void AMyWeapon::Fire()
 			default:
 				{
 					selectEffect = defaultImpactEffect;
+					damage = baseDamage;
 					break;
 				}
 			}

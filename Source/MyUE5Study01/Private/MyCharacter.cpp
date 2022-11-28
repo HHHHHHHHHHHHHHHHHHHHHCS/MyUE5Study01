@@ -2,9 +2,10 @@
 
 
 #include "MyCharacter.h"
-
+#include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "MyUE5Study01/MyUE5Study01.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -25,6 +26,10 @@ AMyCharacter::AMyCharacter()
 	fovSpeed = 0.25f;
 
 	weaponAttachSocketName = "MyWeaponSocket";
+
+	healthComp = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 }
 
 // Called when the game starts or when spawned

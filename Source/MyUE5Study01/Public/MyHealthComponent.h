@@ -14,8 +14,10 @@ class MYUE5STUDY01_API UMyHealthComponent : public UActorComponent
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
-	float health;
+	float defaultHealth;
 
+protected:
+	float health;
 
 public:
 	// Sets default values for this component's properties
@@ -25,5 +27,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
 	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };
