@@ -30,5 +30,6 @@ void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UD
 		return;
 	}
 	health = FMath::Max(health - Damage, 0);
-	UE_LOG(LogTemp, Log, TEXT("HealthChanged: %s"), *FString::SanitizeFloat(health))
+	UE_LOG(LogTemp, Log, TEXT("HealthChanged: %s"), *FString::SanitizeFloat(health));
+	onHealthChanged.Broadcast(this, health, Damage, DamageType, InstigatedBy, DamageCauser);
 }

@@ -7,6 +7,9 @@
 #include "MyHealthComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSingnature, class UMyHealthComponent*, HealthComp, float, Health, float, HealthDelta, const class UDamageType*,
+                                             DamageType, class AController*, InstigatedBy, class AActor*, DamageCauser);
+
 UCLASS(ClassGroup=(COOP), meta=(BlueprintSpawnableComponent))
 class MYUE5STUDY01_API UMyHealthComponent : public UActorComponent
 {
@@ -15,6 +18,9 @@ class MYUE5STUDY01_API UMyHealthComponent : public UActorComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
 	float defaultHealth;
+
+	UPROPERTY(BlueprintAssignable, Category="Events")
+	FOnHealthChangedSingnature onHealthChanged;
 
 protected:
 	float health;
@@ -28,5 +34,5 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, class AActor* DamageCauser);
 };
