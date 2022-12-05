@@ -4,7 +4,7 @@
 #include "MyCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "GameFramework/PawnMovementComponent.h"
+#include "GameFramework//PawnMovementComponent.h"
 #include "MyUE5Study01/MyUE5Study01.h"
 
 // Sets default values
@@ -27,7 +27,7 @@ AMyCharacter::AMyCharacter()
 
 	weaponAttachSocketName = "MyWeaponSocket";
 
-	healthComp = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
+	healthComponent = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 }
@@ -126,6 +126,18 @@ void AMyCharacter::StopFire()
 	if (currWeapon)
 	{
 		currWeapon->StopFire();
+	}
+}
+
+void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType*
+                                   DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0 && !bDied)
+	{
+		//处理死亡状态
+		bDied = true;
+		GetMovementComponent()->StopMovementImmediately();
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

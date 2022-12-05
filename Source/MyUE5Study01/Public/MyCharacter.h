@@ -39,15 +39,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	TSubclassOf<UUserWidget> uiCrosshairsCls;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category="Player")
-	UMyHealthComponent* healthComp;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	UMyHealthComponent* healthComponent;
+
 private:
 	bool bWantsToZoom;
 
 	float defaultFOV;
 
 	AMyWeapon* currWeapon;
+
+	bool bDied = false;
 
 public:
 	// Sets default values for this character's properties
@@ -77,7 +79,10 @@ public:
 	void StartFire();
 
 	void StopFire();
-	
+
+	UFUNCTION()
+	void OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
 private:
 	void BeginZoomFOV();
 
