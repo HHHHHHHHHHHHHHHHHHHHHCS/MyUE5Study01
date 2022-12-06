@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	UMyHealthComponent* healthComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	bool bDied = false;
+
+
 private:
 	bool bWantsToZoom;
 
@@ -49,7 +53,6 @@ private:
 
 	AMyWeapon* currWeapon;
 
-	bool bDied = false;
 
 public:
 	// Sets default values for this character's properties

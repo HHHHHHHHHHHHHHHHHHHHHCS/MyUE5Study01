@@ -54,6 +54,8 @@ void AMyCharacter::BeginPlay()
 		UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
 		widget->AddToViewport();
 	}
+
+	healthComponent->onHealthChanged.AddDynamic(this, &AMyCharacter::OnHealthChanged);
 }
 
 void AMyCharacter::MoveForward(float val)
