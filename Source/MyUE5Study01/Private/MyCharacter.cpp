@@ -140,6 +140,8 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 		bDied = true;
 		GetMovementComponent()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
 	}
 }
 
