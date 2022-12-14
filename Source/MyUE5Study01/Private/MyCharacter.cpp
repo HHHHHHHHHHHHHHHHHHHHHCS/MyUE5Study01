@@ -4,7 +4,9 @@
 #include "MyCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
 #include "GameFramework//PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "MyUE5Study01/MyUE5Study01.h"
 
 // Sets default values
@@ -49,10 +51,22 @@ void AMyCharacter::BeginPlay()
 		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
 	}
 
-	if (uiCrosshairsCls)
+	if (GetController() == UGameplayStatics::GetPlayerController(GetWorld(), 0))
 	{
-		UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
-		widget->AddToViewport();
+		if (uiCrosshairsCls)
+		{
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
+			widget->AddToViewport();
+		}
+
+		if (uiHealthIndicatorCls)
+		{
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
+			widget->AddToViewport();
+			UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
+			mat_img_health = ui_img_health->GetDynamicMaterial();
+			mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
+		}
 	}
 
 	healthComponent->onHealthChanged.AddDynamic(this, &AMyCharacter::OnHealthChanged);
@@ -134,10 +148,17 @@ void AMyCharacter::StopFire()
 void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType*
                                    DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+	if (mat_img_health)
+	{
+		float val = Health / healthComponent->defaultHealth;
+		mat_img_health->SetScalarParameterValue(FName("Alpha"), val);
+	}
+
 	if (Health <= 0 && !bDied)
 	{
 		//处理死亡状态
 		bDied = true;
+		StopFire();
 		GetMovementComponent()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		DetachFromControllerPendingDestroy();

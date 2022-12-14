@@ -6,6 +6,7 @@
 #include "MyHealthComponent.h"
 #include "MyWeapon.h"
 #include "Camera/CameraComponent.h"
+#include "Components/Image.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "MyCharacter.generated.h"
@@ -37,14 +38,16 @@ public:
 	FName weaponAttachSocketName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
-	TSubclassOf<UUserWidget> uiCrosshairsCls;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	UMyHealthComponent* healthComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	bool bDied = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	TSubclassOf<UUserWidget> uiCrosshairsCls;
+
+	UPROPERTY(EditAnywhere, Category="UI")
+	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
 private:
 	bool bWantsToZoom;
@@ -53,7 +56,8 @@ private:
 
 	AMyWeapon* currWeapon;
 
-
+	UMaterialInstanceDynamic* mat_img_health;
+	
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();
