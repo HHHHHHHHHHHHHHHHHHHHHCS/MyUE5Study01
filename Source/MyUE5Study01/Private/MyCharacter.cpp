@@ -51,7 +51,19 @@ void AMyCharacter::BeginPlay()
 		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
 	}
 
-	if (GetController() == UGameplayStatics::GetPlayerController(GetWorld(), 0))
+	bool isPlayer = false;
+	AController* ctrl = GetController();
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		if (ctrl == PlayerController)
+		{
+			isPlayer = true;
+			break;
+		}
+	}
+	
+	if (isPlayer)
 	{
 		if (uiCrosshairsCls)
 		{
