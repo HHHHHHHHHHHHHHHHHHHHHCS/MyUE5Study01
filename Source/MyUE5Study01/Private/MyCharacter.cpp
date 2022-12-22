@@ -40,48 +40,49 @@ void AMyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	defaultFOV = cameraComp->FieldOfView;
-
-
-	if (defaultWeaponCls)
-	{
-		FActorSpawnParameters spawnParams;
-		spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
-		currWeapon->SetOwner(this);
-		currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
-	}
-
-	bool isPlayer = false;
-	AController* ctrl = GetController();
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		APlayerController* PlayerController = Iterator->Get();
-		if (ctrl == PlayerController)
-		{
-			isPlayer = true;
-			break;
-		}
-	}
-	
-	if (isPlayer)
-	{
-		if (uiCrosshairsCls)
-		{
-			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
-			widget->AddToViewport();
-		}
-
-		if (uiHealthIndicatorCls)
-		{
-			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
-			widget->AddToViewport();
-			UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
-			mat_img_health = ui_img_health->GetDynamicMaterial();
-			mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
-		}
-	}
-
 	healthComponent->onHealthChanged.AddDynamic(this, &AMyCharacter::OnHealthChanged);
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		if (defaultWeaponCls)
+		{
+			FActorSpawnParameters spawnParams;
+			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
+			currWeapon->SetOwner(this);
+			currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
+		}
+
+		bool isPlayer = false;
+		AController* ctrl = GetController();
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			APlayerController* PlayerController = Iterator->Get();
+			if (ctrl == PlayerController)
+			{
+				isPlayer = true;
+				break;
+			}
+		}
+
+		if (isPlayer)
+		{
+			if (uiCrosshairsCls)
+			{
+				UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
+				widget->AddToViewport();
+			}
+
+			if (uiHealthIndicatorCls)
+			{
+				UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
+				widget->AddToViewport();
+				UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
+				mat_img_health = ui_img_health->GetDynamicMaterial();
+				mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
+			}
+		}
+	}
 }
 
 void AMyCharacter::MoveForward(float val)

@@ -19,6 +19,7 @@ AMyWeapon::AMyWeapon()
 	traceEndName = "BeamEnd";
 	baseDamage = 20;
 	rateOfFire = 600.0f;
+	SetReplicates(true);
 }
 
 void AMyWeapon::BeginPlay()
