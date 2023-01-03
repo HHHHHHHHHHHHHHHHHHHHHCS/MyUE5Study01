@@ -5,9 +5,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
-#include "GameFramework//PawnMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "MyUE5Study01/MyUE5Study01.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AMyCharacter::AMyCharacter()
@@ -187,4 +188,10 @@ void AMyCharacter::BeginZoomFOV()
 void AMyCharacter::EndZoomFOV()
 {
 	bWantsToZoom = false;
+}
+
+void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMyCharacter, currWeapon);
 }

@@ -7,6 +7,7 @@
 #include "MyUE5Study01/MyUE5Study01.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Net/UnrealNetwork.h"
 
 static int k_debugWeaponDrawing = 0;
 FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,TEXT("Draw debug weapon line."), ECVF_Cheat);
@@ -30,6 +31,11 @@ void AMyWeapon::BeginPlay()
 
 void AMyWeapon::Fire()
 {
+	if(GetLocalRole() < ROLE_Authority)
+	{
+		ServerFire();
+	}
+	UE_LOG(LogTemp, Log, TEXT("1111"));
 	AActor* myOwner = GetOwner();
 	if (myOwner)
 	{
@@ -134,4 +140,14 @@ void AMyWeapon::StartFire()
 void AMyWeapon::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(timerHandle_TimeBetweenShots);
+}
+
+void AMyWeapon::ServerFire_Implementation()
+{
+	Fire();
+}
+
+bool AMyWeapon::ServerFire_Validate()
+{
+	return true;
 }

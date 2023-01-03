@@ -49,15 +49,17 @@ public:
 	UPROPERTY(EditAnywhere, Category="UI")
 	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
+protected:
+	UPROPERTY(Replicated)
+	AMyWeapon* currWeapon;
+
 private:
 	bool bWantsToZoom;
 
 	float defaultFOV;
 
-	AMyWeapon* currWeapon;
-
 	UMaterialInstanceDynamic* mat_img_health;
-	
+
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();

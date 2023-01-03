@@ -67,4 +67,8 @@ public:
 	virtual void StartFire();
 
 	virtual void StopFire();
+	
+	//实现服务器开火函数
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
 };
