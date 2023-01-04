@@ -43,10 +43,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	bool bDied = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UI")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="UI")
 	TSubclassOf<UUserWidget> uiCrosshairsCls;
 
-	UPROPERTY(EditAnywhere, Category="UI")
+	UPROPERTY(Replicated, EditAnywhere, Category="UI")
 	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
 protected:

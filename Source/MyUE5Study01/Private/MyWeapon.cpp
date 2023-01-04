@@ -20,22 +20,22 @@ AMyWeapon::AMyWeapon()
 	traceEndName = "BeamEnd";
 	baseDamage = 20;
 	rateOfFire = 600.0f;
-	SetReplicates(true);
+	bReplicates = true;
 }
 
 void AMyWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	timeBetweenShots = 60.0f / rateOfFire;
+	SetReplicates(true);
 }
 
 void AMyWeapon::Fire()
 {
-	if(GetLocalRole() < ROLE_Authority)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		ServerFire();
 	}
-	UE_LOG(LogTemp, Log, TEXT("1111"));
 	AActor* myOwner = GetOwner();
 	if (myOwner)
 	{
@@ -90,12 +90,17 @@ void AMyWeapon::Fire()
 			traceEndPoint = hit.ImpactPoint;
 		}
 
-		if (k_debugWeaponDrawing != 0)
+		if (k_debugWeaponDrawing > 0)
 		{
 			DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
 		}
 
 		PlayFireEffect(traceEndPoint);
+
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			hitScanTrace.traceTo = traceEndPoint;
+		}
 	}
 }
 
@@ -142,6 +147,11 @@ void AMyWeapon::StopFire()
 	GetWorldTimerManager().ClearTimer(timerHandle_TimeBetweenShots);
 }
 
+void AMyWeapon::OnRep_HitScanTrace()
+{
+	PlayFireEffect(hitScanTrace.traceTo);
+}
+
 void AMyWeapon::ServerFire_Implementation()
 {
 	Fire();
@@ -150,4 +160,10 @@ void AMyWeapon::ServerFire_Implementation()
 bool AMyWeapon::ServerFire_Validate()
 {
 	return true;
+}
+
+void AMyWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(AMyWeapon, hitScanTrace, COND_SkipOwner);
 }

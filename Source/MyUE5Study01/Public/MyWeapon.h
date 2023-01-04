@@ -6,6 +6,20 @@
 #include "GameFramework/Actor.h"
 #include "MyWeapon.generated.h"
 
+USTRUCT()
+struct FHitScanTrace
+{
+	GENERATED_BODY()
+	
+public:
+	
+	UPROPERTY()
+	FVector_NetQuantize traceFrom;
+
+	UPROPERTY()
+	FVector_NetQuantize traceTo;
+};
+
 UCLASS()
 class MYUE5STUDY01_API AMyWeapon : public AActor
 {
@@ -45,6 +59,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Weapon")
 	float rateOfFire;
 
+	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
+	FHitScanTrace hitScanTrace;
+	
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();
@@ -67,8 +84,11 @@ public:
 	virtual void StartFire();
 
 	virtual void StopFire();
-	
+
 	//实现服务器开火函数
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerFire();
+
+	UFUNCTION()
+	void OnRep_HitScanTrace();
 };

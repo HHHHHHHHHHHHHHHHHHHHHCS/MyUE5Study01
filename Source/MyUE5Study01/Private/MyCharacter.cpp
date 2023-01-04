@@ -53,35 +53,41 @@ void AMyCharacter::BeginPlay()
 			currWeapon->SetOwner(this);
 			currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
 		}
+	}
 
-		bool isPlayer = false;
-		AController* ctrl = GetController();
-		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
+
+	bool isPlayer = false;
+	AController* ctrl = GetController();
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PlayerController = Iterator->Get();
+		if (ctrl == PlayerController)
 		{
-			APlayerController* PlayerController = Iterator->Get();
-			if (ctrl == PlayerController)
-			{
-				isPlayer = true;
-				break;
-			}
+			isPlayer = true;
+			break;
+		}
+	}
+
+	if (isPlayer)
+	{
+		if (uiCrosshairsCls)
+		{
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
+			widget->AddToViewport();
 		}
 
-		if (isPlayer)
+		if (uiHealthIndicatorCls)
 		{
-			if (uiCrosshairsCls)
-			{
-				UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
-				widget->AddToViewport();
-			}
-
-			if (uiHealthIndicatorCls)
-			{
-				UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
-				widget->AddToViewport();
-				UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
-				mat_img_health = ui_img_health->GetDynamicMaterial();
-				mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
-			}
+			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
+			widget->AddToViewport();
+			UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
+			mat_img_health = ui_img_health->GetDynamicMaterial();
+			mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
 		}
 	}
 }
