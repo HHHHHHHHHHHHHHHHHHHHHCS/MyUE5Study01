@@ -10,11 +10,10 @@ USTRUCT()
 struct FHitScanTrace
 {
 	GENERATED_BODY()
-	
+
 public:
-	
 	UPROPERTY()
-	FVector_NetQuantize traceFrom;
+	TEnumAsByte<EPhysicalSurface> surfaceType;
 
 	UPROPERTY()
 	FVector_NetQuantize traceTo;
@@ -61,7 +60,7 @@ public:
 
 	UPROPERTY(ReplicatedUsing = OnRep_HitScanTrace)
 	FHitScanTrace hitScanTrace;
-	
+
 public:
 	// Sets default values for this actor's properties
 	AMyWeapon();
@@ -88,6 +87,8 @@ public:
 	//实现服务器开火函数
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerFire();
+
+	void PlayImpactEffects(EPhysicalSurface surfaceType, FVector impactPoint);
 
 	UFUNCTION()
 	void OnRep_HitScanTrace();
