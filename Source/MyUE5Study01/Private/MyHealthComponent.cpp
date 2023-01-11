@@ -3,10 +3,13 @@
 
 #include "MyHealthComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values for this component's properties
 UMyHealthComponent::UMyHealthComponent()
 {
 	defaultHealth = 100;
+	SetIsReplicated(true);
 }
 
 
@@ -14,12 +17,16 @@ UMyHealthComponent::UMyHealthComponent()
 void UMyHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AActor* myOwner = GetOwner();
-	if (myOwner)
+	// 仅为服务器的时候, 生命值和伤害时间挂钩
+	if (GetOwnerRole() == ROLE_Authority)
 	{
-		myOwner->OnTakeAnyDamage.AddDynamic(this, &UMyHealthComponent::TakeDamage);
+		AActor* myOwner = GetOwner();
+		if (myOwner)
+		{
+			myOwner->OnTakeAnyDamage.AddDynamic(this, &UMyHealthComponent::TakeDamage);
+		}
 	}
+
 	health = defaultHealth;
 }
 
@@ -32,4 +39,11 @@ void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UD
 	health = FMath::Max(health - Damage, 0);
 	UE_LOG(LogTemp, Log, TEXT("HealthChanged: %s"), *FString::SanitizeFloat(health));
 	onHealthChanged.Broadcast(this, health, Damage, DamageType, InstigatedBy, DamageCauser);
+}
+
+
+void UMyHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UMyHealthComponent, health);
 }

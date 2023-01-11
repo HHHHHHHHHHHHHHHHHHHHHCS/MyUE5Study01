@@ -23,6 +23,7 @@ public:
 	FOnHealthChangedSingnature onHealthChanged;
 
 protected:
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Player")
 	float health;
 
 public:

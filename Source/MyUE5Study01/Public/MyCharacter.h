@@ -40,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	UMyHealthComponent* healthComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Player")
 	bool bDied = false;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="UI")
