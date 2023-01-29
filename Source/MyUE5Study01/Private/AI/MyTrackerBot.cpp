@@ -3,6 +3,11 @@
 
 #include "AI/MyTrackerBot.h"
 
+#include "MyCharacter.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AMyTrackerBot::AMyTrackerBot()
 {
@@ -17,6 +22,17 @@ AMyTrackerBot::AMyTrackerBot()
 void AMyTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+FVector AMyTrackerBot::GetNextPathPoint()
+{
+	AMyCharacter* playerPawn = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	UNavigationPath* navPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), playerPawn);
+	if(navPath->PathPoints.Num()>1)
+	{
+		return navPath->PathPoints[1];
+	}
+	return GetActorLocation();
 }
 
 // Called every frame
