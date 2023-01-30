@@ -16,15 +16,27 @@ public:
 	AMyTrackerBot();
 
 public:
-	UPROPERTY(VisibleDefaultsOnly,Category="Components")
+	UPROPERTY(VisibleDefaultsOnly, Category="Components")
 	UStaticMeshComponent* meshComp;
+
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	float movementForce;
+
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	bool useVelocityChange;
+
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	float requireDistanceToTarget;
+
+private:
+	FVector nextPathPoint;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	FVector GetNextPathPoint();
-	
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

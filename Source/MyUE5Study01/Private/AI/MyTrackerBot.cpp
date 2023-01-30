@@ -15,20 +15,25 @@ AMyTrackerBot::AMyTrackerBot()
 	PrimaryActorTick.bCanEverTick = true;
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	meshComp->SetCanEverAffectNavigation(false);
+	meshComp->SetSimulatePhysics(true);
 	SetRootComponent(meshComp);
+	useVelocityChange = true;
+	movementForce = 1000;
+	requireDistanceToTarget = 100.0f;
 }
 
 // Called when the game starts or when spawned
 void AMyTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
+	nextPathPoint = GetNextPathPoint();
 }
 
 FVector AMyTrackerBot::GetNextPathPoint()
 {
 	AMyCharacter* playerPawn = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	UNavigationPath* navPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), playerPawn);
-	if(navPath->PathPoints.Num()>1)
+	if (navPath && navPath->PathPoints.Num() > 1)
 	{
 		return navPath->PathPoints[1];
 	}
@@ -39,4 +44,19 @@ FVector AMyTrackerBot::GetNextPathPoint()
 void AMyTrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (FVector::Distance(GetActorLocation(), nextPathPoint) > requireDistanceToTarget)
+	{
+		//执行移动
+		FVector forceDir = nextPathPoint - GetActorLocation();
+		forceDir.Normalize();
+		forceDir *= movementForce;
+		meshComp->AddForce(forceDir, NAME_None, useVelocityChange);
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector()*100, 32, FColor::Red);
+	}
+	else
+	{
+		nextPathPoint = GetNextPathPoint();
+		DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
+	}
+	DrawDebugSphere(GetWorld(), nextPathPoint, 20, 12, FColor::Yellow);
 }
