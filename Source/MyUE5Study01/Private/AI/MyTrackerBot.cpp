@@ -16,6 +16,8 @@ AMyTrackerBot::AMyTrackerBot()
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	meshComp->SetCanEverAffectNavigation(false);
 	meshComp->SetSimulatePhysics(true);
+	healthComponent = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
+	healthComponent->onHealthChanged.AddDynamic(this, &AMyTrackerBot::HandleTakeDamage);
 	SetRootComponent(meshComp);
 	useVelocityChange = true;
 	movementForce = 1000;
@@ -51,7 +53,7 @@ void AMyTrackerBot::Tick(float DeltaTime)
 		forceDir.Normalize();
 		forceDir *= movementForce;
 		meshComp->AddForce(forceDir, NAME_None, useVelocityChange);
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector()*100, 32, FColor::Red);
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100, 32, FColor::Red);
 	}
 	else
 	{
@@ -59,4 +61,10 @@ void AMyTrackerBot::Tick(float DeltaTime)
 		DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
 	}
 	DrawDebugSphere(GetWorld(), nextPathPoint, 20, 12, FColor::Yellow);
+}
+
+void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy,
+                                     AActor* DamageCauser)
+{
+	UE_LOG(LogTemp, Log, TEXT("Health %s of  %s"), *FString::SanitizeFloat(Health), *DamageCauser->GetName());
 }

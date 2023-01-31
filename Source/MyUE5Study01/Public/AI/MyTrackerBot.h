@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyHealthComponent.h"
 #include "GameFramework/Pawn.h"
 #include "MyTrackerBot.generated.h"
 
@@ -19,6 +20,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category="Components")
 	UStaticMeshComponent* meshComp;
 
+	UPROPERTY(VisibleDefaultsOnly, Category="Components")
+	UMyHealthComponent* healthComponent;
+
 	UPROPERTY(EditAnywhere, Category="TrackerBot")
 	float movementForce;
 
@@ -27,6 +31,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="TrackerBot")
 	float requireDistanceToTarget;
+
 
 private:
 	FVector nextPathPoint;
@@ -40,4 +45,7 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 };
