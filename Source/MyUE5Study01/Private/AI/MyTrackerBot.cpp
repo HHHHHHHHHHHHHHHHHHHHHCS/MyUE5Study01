@@ -67,4 +67,12 @@ void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Healt
                                      AActor* DamageCauser)
 {
 	UE_LOG(LogTemp, Log, TEXT("Health %s of  %s"), *FString::SanitizeFloat(Health), *DamageCauser->GetName());
+	if (matInst == nullptr)
+	{
+		matInst = meshComp->CreateAndSetMaterialInstanceDynamicFromMaterial(0, meshComp->GetMaterial(0));
+	}
+	if (matInst)
+	{
+		matInst->SetScalarParameterValue(TEXT("LastTimeDamage"), GetWorld()->TimeSeconds);
+	}
 }
