@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "MyHealthComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Pawn.h"
+#include "Sound/SoundCue.h"
 #include "MyTrackerBot.generated.h"
 
 UCLASS()
@@ -32,12 +34,41 @@ public:
 	UPROPERTY(EditAnywhere, Category="TrackerBot")
 	float requireDistanceToTarget;
 
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	UParticleSystem* explosionEffect;
 
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	float explosionRadius;
+
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	float explosionDamage;
+
+	UPROPERTY(VisibleDefaultsOnly, Category="TrackerBot")
+	USphereComponent* sphereComp;
+
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	float selfDamageInterval;
+	
+	// 对人物造成伤害的音效
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	USoundCue* selfDestroyCue;
+
+	// 爆炸音效
+	UPROPERTY(EditAnywhere, Category="TrackerBot")
+	USoundCue* explodeSound;
+	
 private:
 	FVector nextPathPoint;
 
 	UMaterialInstanceDynamic* matInst;
 
+	bool isExploded;
+
+	FTimerHandle timerHandle_damageSelf;
+
+	bool isStartDamageSelf;
+	
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,4 +81,10 @@ public:
 
 	UFUNCTION()
 	void HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	void DamageSelf();
+	
+	void SelfDestroy();
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

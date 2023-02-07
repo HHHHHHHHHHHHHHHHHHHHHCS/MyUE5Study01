@@ -16,12 +16,27 @@ AMyTrackerBot::AMyTrackerBot()
 	meshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	meshComp->SetCanEverAffectNavigation(false);
 	meshComp->SetSimulatePhysics(true);
+	SetRootComponent(meshComp);
+
 	healthComponent = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
 	healthComponent->onHealthChanged.AddDynamic(this, &AMyTrackerBot::HandleTakeDamage);
-	SetRootComponent(meshComp);
+
+	sphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	sphereComp->SetSphereRadius(200);
+	sphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	sphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	sphereComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	sphereComp->SetupAttachment(RootComponent);
+
 	useVelocityChange = true;
 	movementForce = 1000;
 	requireDistanceToTarget = 100.0f;
+	isExploded = false;
+	explosionDamage = 40;
+	explosionRadius = 200;
+
+	isStartDamageSelf = false;
+	selfDamageInterval = 0.5f;
 }
 
 // Called when the game starts or when spawned
@@ -74,5 +89,49 @@ void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Healt
 	if (matInst)
 	{
 		matInst->SetScalarParameterValue(TEXT("LastTimeDamage"), GetWorld()->TimeSeconds);
+	}
+	if (Health <= 0)
+	{
+		SelfDestroy();
+	}
+}
+
+void AMyTrackerBot::DamageSelf()
+{
+	UGameplayStatics::ApplyDamage(this, 20, GetInstigatorController(), this, nullptr);
+}
+
+void AMyTrackerBot::SelfDestroy()
+{
+	if (isExploded)
+	{
+		return;
+	}
+
+	isExploded = true;
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation());
+	TArray<AActor*> ignoredActors;
+	ignoredActors.Add(this);
+
+	UGameplayStatics::ApplyRadialDamage(this, explosionDamage, GetActorLocation(), explosionRadius,
+	                                    nullptr, ignoredActors, this, GetInstigatorController(), true);
+	Destroy();
+
+	UGameplayStatics::PlaySoundAtLocation(this, explodeSound, GetActorLocation());
+}
+
+void AMyTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if (isStartDamageSelf)
+	{
+		return;
+	}
+
+	AMyCharacter* character = Cast<AMyCharacter>(OtherActor);
+	if (character)
+	{
+		GetWorld()->GetTimerManager().SetTimer(timerHandle_damageSelf, this, &AMyTrackerBot::DamageSelf, selfDamageInterval, true, 0.0f);
+		isStartDamageSelf = true;
+		UGameplayStatics::SpawnSoundAttached(selfDestroyCue, RootComponent);
 	}
 }
