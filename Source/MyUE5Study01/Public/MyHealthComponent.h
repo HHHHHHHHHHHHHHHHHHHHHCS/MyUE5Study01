@@ -23,7 +23,7 @@ public:
 	FOnHealthChangedSingnature onHealthChanged;
 
 protected:
-	UPROPERTY(Replicated, BlueprintReadOnly, Category="Player")
+	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category="Player")
 	float health;
 
 public:
@@ -36,4 +36,7 @@ protected:
 
 	UFUNCTION()
 	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, class AActor* DamageCauser);
+
+	UFUNCTION()
+	void OnRep_Health(float oldHealth);
 };

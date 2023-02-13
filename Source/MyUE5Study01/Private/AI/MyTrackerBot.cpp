@@ -43,7 +43,10 @@ AMyTrackerBot::AMyTrackerBot()
 void AMyTrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
-	nextPathPoint = GetNextPathPoint();
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		nextPathPoint = GetNextPathPoint();
+	}
 }
 
 FVector AMyTrackerBot::GetNextPathPoint()
@@ -61,6 +64,10 @@ FVector AMyTrackerBot::GetNextPathPoint()
 void AMyTrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (GetLocalRole() != ROLE_Authority || isExploded)
+	{
+		return;
+	}
 	if (FVector::Distance(GetActorLocation(), nextPathPoint) > requireDistanceToTarget)
 	{
 		//执行移动
@@ -81,7 +88,7 @@ void AMyTrackerBot::Tick(float DeltaTime)
 void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy,
                                      AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Log, TEXT("Health %s of  %s"), *FString::SanitizeFloat(Health), *DamageCauser->GetName());
+	// UE_LOG(LogTemp, Log, TEXT("Health %s of  %s"), *FString::SanitizeFloat(Health), *DamageCauser->GetName());
 	if (matInst == nullptr)
 	{
 		matInst = meshComp->CreateAndSetMaterialInstanceDynamicFromMaterial(0, meshComp->GetMaterial(0));
@@ -110,19 +117,25 @@ void AMyTrackerBot::SelfDestroy()
 
 	isExploded = true;
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation());
-	TArray<AActor*> ignoredActors;
-	ignoredActors.Add(this);
-
-	UGameplayStatics::ApplyRadialDamage(this, explosionDamage, GetActorLocation(), explosionRadius,
-	                                    nullptr, ignoredActors, this, GetInstigatorController(), true);
-	Destroy();
-
 	UGameplayStatics::PlaySoundAtLocation(this, explodeSound, GetActorLocation());
+
+	meshComp->SetVisibility(false,true);
+	meshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		TArray<AActor*> ignoredActors;
+		ignoredActors.Add(this);
+
+		UGameplayStatics::ApplyRadialDamage(this, explosionDamage, GetActorLocation(), explosionRadius,
+		                                    nullptr, ignoredActors, this, GetInstigatorController(), true);
+		SetLifeSpan(2.0f);
+	}
 }
 
 void AMyTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (isStartDamageSelf)
+	if (isStartDamageSelf || isExploded)
 	{
 		return;
 	}
@@ -130,7 +143,10 @@ void AMyTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 	AMyCharacter* character = Cast<AMyCharacter>(OtherActor);
 	if (character)
 	{
-		GetWorld()->GetTimerManager().SetTimer(timerHandle_damageSelf, this, &AMyTrackerBot::DamageSelf, selfDamageInterval, true, 0.0f);
+		if (GetLocalRole() == ROLE_Authority)
+		{
+			GetWorld()->GetTimerManager().SetTimer(timerHandle_damageSelf, this, &AMyTrackerBot::DamageSelf, selfDamageInterval, true, 0.0f);
+		}
 		isStartDamageSelf = true;
 		UGameplayStatics::SpawnSoundAttached(selfDestroyCue, RootComponent);
 	}
