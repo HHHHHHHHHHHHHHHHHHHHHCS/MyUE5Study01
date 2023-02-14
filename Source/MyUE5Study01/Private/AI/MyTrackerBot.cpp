@@ -119,7 +119,7 @@ void AMyTrackerBot::SelfDestroy()
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionEffect, GetActorLocation());
 	UGameplayStatics::PlaySoundAtLocation(this, explodeSound, GetActorLocation());
 
-	meshComp->SetVisibility(false,true);
+	meshComp->SetVisibility(false, true);
 	meshComp->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
 	if (GetLocalRole() == ROLE_Authority)
@@ -135,6 +135,8 @@ void AMyTrackerBot::SelfDestroy()
 
 void AMyTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorBeginOverlap(OtherActor);
+
 	if (isStartDamageSelf || isExploded)
 	{
 		return;
