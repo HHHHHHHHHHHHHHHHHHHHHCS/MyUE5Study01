@@ -17,12 +17,12 @@ AMyPowerUpActor::AMyPowerUpActor()
 void AMyPowerUpActor::BeginPlay()
 {
 	Super::BeginPlay();
-	ActivePowerup();
 }
 
 void AMyPowerUpActor::OnTickPowerup()
 {
 	tickProcessed++;
+	OnPowerupTicked();
 	if (tickProcessed >= totalOfTicks)
 	{
 		OnExpired();

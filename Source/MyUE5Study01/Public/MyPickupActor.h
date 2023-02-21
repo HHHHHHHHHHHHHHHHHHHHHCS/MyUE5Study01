@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MyPowerUpActor.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "MyPickupActor.generated.h"
@@ -22,6 +23,16 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UDecalComponent* decalComp;
 
+	UPROPERTY(EditAnywhere, Category="Pickup")
+	TSubclassOf<AMyPowerUpActor> powerUpClass;
+
+	UPROPERTY(EditAnywhere, Category="Pickup")
+	float spawnDuration;
+
+	
+private:
+	AMyPowerUpActor* powerUpInst;
+	FTimerHandle timerHandle_respawn;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,4 +42,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+	void Respawn();
 };
