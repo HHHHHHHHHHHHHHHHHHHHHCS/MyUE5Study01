@@ -56,5 +56,5 @@ void AMyPickupActor::Respawn()
 	}
 	FActorSpawnParameters spawnParams;
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<AMyPowerUpActor>(powerUpClass, GetTransform(), spawnParams);
+	powerUpInst = GetWorld()->SpawnActor<AMyPowerUpActor>(powerUpClass, GetTransform(), spawnParams);
 }
