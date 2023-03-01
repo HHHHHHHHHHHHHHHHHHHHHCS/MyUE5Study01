@@ -39,4 +39,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Health(float oldHealth);
+
+	UFUNCTION(BlueprintCallable)
+	void AddHealth(float value);
 };

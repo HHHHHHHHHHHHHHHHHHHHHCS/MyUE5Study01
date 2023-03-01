@@ -23,10 +23,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	UDecalComponent* decalComp;
 
-	UPROPERTY(EditAnywhere, Category="Pickup")
+	UPROPERTY(EditInstanceOnly, Category="Pickup")
 	TSubclassOf<AMyPowerUpActor> powerUpClass;
 
-	UPROPERTY(EditAnywhere, Category="Pickup")
+	UPROPERTY(EditInstanceOnly, Category="Pickup")
 	float spawnDuration;
 
 	
