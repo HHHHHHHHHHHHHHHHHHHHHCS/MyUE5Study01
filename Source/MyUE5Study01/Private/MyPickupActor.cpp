@@ -19,15 +19,19 @@ AMyPickupActor::AMyPickupActor()
 	decalComp->SetRelativeLocation(FVector(0, 0, 20));
 	decalComp->SetRelativeRotation(FRotator(90, 0, 0));
 	decalComp->DecalSize = FVector(40, 80, 80);
-	
+
 	spawnDuration = 10.0f;
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
 void AMyPickupActor::BeginPlay()
 {
 	Super::BeginPlay();
-	Respawn();
+	if (GetLocalRole() == ROLE_Authority)
+	{
+		Respawn();
+	}
 }
 
 // Called every frame
@@ -40,17 +44,17 @@ void AMyPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	//增强相关的逻辑
-	if(powerUpInst)
+	if (powerUpInst)
 	{
 		powerUpInst->ActivePowerup();
 		powerUpInst = nullptr;
-		GetWorldTimerManager().SetTimer(timerHandle_respawn, this,&AMyPickupActor::Respawn,spawnDuration);
+		GetWorldTimerManager().SetTimer(timerHandle_respawn, this, &AMyPickupActor::Respawn, spawnDuration);
 	}
 }
 
 void AMyPickupActor::Respawn()
 {
-	if (powerUpClass == nullptr)
+	if (powerUpClass == nullptr || GetLocalRole() != ROLE_Authority)
 	{
 		return;
 	}

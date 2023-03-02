@@ -18,10 +18,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Powerups")
 	int32 totalOfTicks;
 
+	UPROPERTY(ReplicatedUsing = OnRep_PowerupActive)
+	bool isPowerupActive;
+
 private:
 	FTimerHandle TimerHandle_PowerupTicks;
 	//已经处理过的更新
 	int32 tickProcessed;
+
 
 public:
 	// Sets default values for this actor's properties
@@ -50,4 +54,10 @@ public:
 	//应用增强更新时候 在蓝图中实现
 	UFUNCTION(BlueprintImplementableEvent, Category="Powerups")
 	void OnPowerupTicked();
+
+	UFUNCTION()
+	void OnRep_PowerupActive();
+
+	UFUNCTION(BlueprintImplementableEvent, Category="Powerups")
+	void OnPowerStateChanged(bool newIsActive);
 };
