@@ -46,7 +46,7 @@ void AMyPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 	//增强相关的逻辑
 	if (powerUpInst)
 	{
-		powerUpInst->ActivePowerup();
+		powerUpInst->ActivePowerup(OtherActor);
 		powerUpInst = nullptr;
 		GetWorldTimerManager().SetTimer(timerHandle_respawn, this, &AMyPickupActor::Respawn, spawnDuration);
 	}

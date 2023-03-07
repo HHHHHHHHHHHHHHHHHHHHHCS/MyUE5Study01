@@ -41,11 +41,11 @@ public:
 	void OnTickPowerup();
 
 	//激活增强道具时
-	void ActivePowerup();
+	void ActivePowerup(AActor* actorFor);
 
 	//当激活时 在蓝图中实现
 	UFUNCTION(BlueprintImplementableEvent, Category="Powerups")
-	void OnActived();
+	void OnActived(AActor* actorFor);
 
 	//当失效时 在蓝图中实现
 	UFUNCTION(BlueprintImplementableEvent, Category="Powerups")

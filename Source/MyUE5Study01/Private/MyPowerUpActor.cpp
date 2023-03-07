@@ -35,9 +35,9 @@ void AMyPowerUpActor::OnTickPowerup()
 	}
 }
 
-void AMyPowerUpActor::ActivePowerup()
+void AMyPowerUpActor::ActivePowerup(AActor* actorFor)
 {
-	OnActived();
+	OnActived(actorFor);
 	isPowerupActive = true;
 	OnRep_PowerupActive();
 	if (powerupInterval > 0.0f)
