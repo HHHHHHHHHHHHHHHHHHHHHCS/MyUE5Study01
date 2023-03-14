@@ -3,6 +3,7 @@
 
 #include "MyPickupActor.h"
 
+#include "MyCharacter.h"
 #include "Components/DecalComponent.h"
 
 // Sets default values
@@ -46,9 +47,13 @@ void AMyPickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 	//增强相关的逻辑
 	if (powerUpInst)
 	{
-		powerUpInst->ActivePowerup(OtherActor);
-		powerUpInst = nullptr;
-		GetWorldTimerManager().SetTimer(timerHandle_respawn, this, &AMyPickupActor::Respawn, spawnDuration);
+		AMyCharacter* myChar = Cast<AMyCharacter>(OtherActor);
+		if (myChar)
+		{
+			powerUpInst->ActivePowerup(OtherActor);
+			powerUpInst = nullptr;
+			GetWorldTimerManager().SetTimer(timerHandle_respawn, this, &AMyPickupActor::Respawn, spawnDuration);
+		}
 	}
 }
 
