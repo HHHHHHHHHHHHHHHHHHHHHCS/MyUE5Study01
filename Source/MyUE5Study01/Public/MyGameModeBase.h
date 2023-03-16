@@ -13,5 +13,35 @@ UCLASS()
 class MYUE5STUDY01_API AMyGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category="GameMode")
+	float betweenWaveTime;
+
+private:
+	FTimerHandle timerHandle_BotSpawner;
+	FTimerHandle timerHandle_NextWaveStart;
+
+	int waveCount;
+
+	int botNumber;
+
+public:
+	AMyGameModeBase();
 	
+	virtual void StartPlay() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnNewBot();
+
+	//开始生成一波机器人
+	void StartWave();
+
+	//停止这波机器人的生成
+	void EndWave();
+
+	//准备下波机器人的生成
+	void PrepareNextWave();
+
+	void SpawnBotTimeElapsed();
 };
