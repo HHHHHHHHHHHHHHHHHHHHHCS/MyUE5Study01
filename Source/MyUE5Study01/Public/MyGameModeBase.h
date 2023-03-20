@@ -26,10 +26,14 @@ private:
 
 	int botNumber;
 
+	bool isAnyBotAlive;
+
 public:
 	AMyGameModeBase();
-	
+
 	virtual void StartPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SpawnNewBot();
@@ -44,4 +48,6 @@ public:
 	void PrepareNextWave();
 
 	void SpawnBotTimeElapsed();
+
+	void CheckWaveState();
 };

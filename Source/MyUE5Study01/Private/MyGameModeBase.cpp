@@ -3,14 +3,27 @@
 
 #include "MyGameModeBase.h"
 
+#include "EngineUtils.h"
+#include "MyHealthComponent.h"
+
 AMyGameModeBase::AMyGameModeBase()
 {
 	betweenWaveTime = 2.0f;
+	isAnyBotAlive = false;
 }
 
 void AMyGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+	PrepareNextWave();
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 1.0f;
+}
+
+void AMyGameModeBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	CheckWaveState();
 }
 
 void AMyGameModeBase::StartWave()
@@ -38,5 +51,30 @@ void AMyGameModeBase::SpawnBotTimeElapsed()
 	if (botNumber <= 0)
 	{
 		EndWave();
+	}
+}
+
+void AMyGameModeBase::CheckWaveState()
+{
+	bool isPrepareWave = GetWorldTimerManager().IsTimerActive(timerHandle_NextWaveStart);
+	if (isPrepareWave && botNumber > 0)
+	{
+		return;
+	}
+	isAnyBotAlive = false;
+	for (TActorIterator<APawn> it(GetWorld()); it; ++it)
+	{
+		APawn* pawn = *it;
+		if (pawn == nullptr || pawn->IsPawnControlled())
+		{
+			continue;
+		}
+
+		auto healthComp = Cast<UMyHealthComponent>(pawn->GetComponentByClass(UMyHealthComponent::StaticClass()));
+		if (healthComp && healthComp->GetHealth() > 0.0f)
+		{
+			isAnyBotAlive = true;
+			break;
+		}
 	}
 }
