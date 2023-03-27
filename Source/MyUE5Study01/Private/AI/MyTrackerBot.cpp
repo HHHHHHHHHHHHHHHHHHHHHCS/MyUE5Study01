@@ -52,7 +52,13 @@ void AMyTrackerBot::BeginPlay()
 FVector AMyTrackerBot::GetNextPathPoint()
 {
 	AMyCharacter* playerPawn = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if(!playerPawn)
+	{
+		return FVector::Zero();
+	}
+
 	UNavigationPath* navPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), playerPawn);
+
 	if (navPath && navPath->PathPoints.Num() > 1)
 	{
 		return navPath->PathPoints[1];

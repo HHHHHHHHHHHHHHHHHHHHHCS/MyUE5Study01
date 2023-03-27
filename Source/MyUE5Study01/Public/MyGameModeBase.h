@@ -50,4 +50,9 @@ public:
 	void SpawnBotTimeElapsed();
 
 	void CheckWaveState();
+
+	void GameOver();
+
+	//检测玩家存活状态
+	void CheckAnyPlayerAlive();
 };

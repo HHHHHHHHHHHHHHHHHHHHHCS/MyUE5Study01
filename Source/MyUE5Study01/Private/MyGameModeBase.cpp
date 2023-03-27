@@ -78,3 +78,28 @@ void AMyGameModeBase::CheckWaveState()
 		}
 	}
 }
+
+void AMyGameModeBase::GameOver()
+{
+	EndWave();
+}
+
+void AMyGameModeBase::CheckAnyPlayerAlive()
+{
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+	{
+		APlayerController* pc = it->Get();
+		if (pc && pc->GetPawn())
+		{
+			APawn* myPawn = pc->GetPawn();
+			UMyHealthComponent* healthComp = Cast<UMyHealthComponent>(myPawn->GetComponentByClass(UMyHealthComponent::StaticClass()));
+			if (ensure(healthComp) && healthComp->GetHealth() > 0)
+			{
+				// 玩家存在
+				return;
+			}
+		}
+	}
+
+	GameOver();
+}
