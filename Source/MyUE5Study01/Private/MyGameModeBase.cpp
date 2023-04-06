@@ -5,19 +5,22 @@
 
 #include "EngineUtils.h"
 #include "MyHealthComponent.h"
+#include "GameFramework/PlayerState.h"
 
 AMyGameModeBase::AMyGameModeBase()
 {
 	betweenWaveTime = 2.0f;
 	isAnyBotAlive = false;
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 1.0f;
+	GameStateClass = AMyGameState::StaticClass();
+	PlayerStateClass = APlayerState::StaticClass();
 }
 
 void AMyGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 	PrepareNextWave();
-	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 1.0f;
 }
 
 void AMyGameModeBase::Tick(float DeltaSeconds)
@@ -31,17 +34,20 @@ void AMyGameModeBase::StartWave()
 	waveCount++;
 	botNumber = 2 * waveCount;
 	GetWorldTimerManager().SetTimer(timerHandle_BotSpawner, this, &AMyGameModeBase::SpawnNewBot, 1.0f, true, 0.0f);
+	SetWaveState(EWaveState::WaveInProgress);
 }
 
 void AMyGameModeBase::EndWave()
 {
 	GetWorldTimerManager().ClearTimer(timerHandle_BotSpawner);
 	PrepareNextWave();
+	SetWaveState(EWaveState::WaitingToComplete);
 }
 
 void AMyGameModeBase::PrepareNextWave()
 {
 	GetWorldTimerManager().SetTimer(timerHandle_NextWaveStart, this, &AMyGameModeBase::StartWave, betweenWaveTime, true);
+	SetWaveState(EWaveState::WaitingToStart);
 }
 
 void AMyGameModeBase::SpawnBotTimeElapsed()
@@ -77,11 +83,16 @@ void AMyGameModeBase::CheckWaveState()
 			break;
 		}
 	}
+	if (!isAnyBotAlive)
+	{
+		SetWaveState(EWaveState::WaveComplete);
+	}
 }
 
 void AMyGameModeBase::GameOver()
 {
 	EndWave();
+	SetWaveState(EWaveState::GameOver);
 }
 
 void AMyGameModeBase::CheckAnyPlayerAlive()
@@ -102,4 +113,13 @@ void AMyGameModeBase::CheckAnyPlayerAlive()
 	}
 
 	GameOver();
+}
+
+void AMyGameModeBase::SetWaveState(EWaveState newState)
+{
+	AMyGameState* gs = GetGameState<AMyGameState>();
+	if (ensureAlways(gs))
+	{
+		gs->SetWaveState(newState);
+	}
 }

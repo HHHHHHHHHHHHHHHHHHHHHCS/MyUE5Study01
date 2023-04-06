@@ -22,6 +22,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnHealthChangedSingnature onHealthChanged;
 
+	bool isDead;
+
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category="Player")
 	float health;

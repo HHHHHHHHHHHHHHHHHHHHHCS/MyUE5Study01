@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "MyGameState.h"
 #include "MyGameModeBase.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActorKilled, AActor*, VictimActor, AActor*, killerActor);
+
 UCLASS()
 class MYUE5STUDY01_API AMyGameModeBase : public AGameModeBase
 {
@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="GameMode")
 	float betweenWaveTime;
 
+	UPROPERTY(BlueprintAssignable, Category="GameMode")
+	FOnActorKilled onActorKilled;
+	
 private:
 	FTimerHandle timerHandle_BotSpawner;
 	FTimerHandle timerHandle_NextWaveStart;
@@ -55,4 +58,6 @@ public:
 
 	//检测玩家存活状态
 	void CheckAnyPlayerAlive();
+
+	void SetWaveState(EWaveState newWaveState);
 };

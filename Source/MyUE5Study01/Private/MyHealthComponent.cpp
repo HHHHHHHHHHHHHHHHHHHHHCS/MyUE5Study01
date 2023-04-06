@@ -3,6 +3,7 @@
 
 #include "MyHealthComponent.h"
 
+#include "MyGameModeBase.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
@@ -10,6 +11,7 @@ UMyHealthComponent::UMyHealthComponent()
 {
 	defaultHealth = 100;
 	SetIsReplicated(true);
+	isDead = false;
 }
 
 
@@ -32,13 +34,22 @@ void UMyHealthComponent::BeginPlay()
 
 void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage <= 0)
+	if (Damage <= 0 && isDead)
 	{
 		return;
 	}
 	health = FMath::Max(health - Damage, 0);
 	UE_LOG(LogTemp, Log, TEXT("HealthChanged: %s"), *FString::SanitizeFloat(health));
 	onHealthChanged.Broadcast(this, health, Damage, DamageType, InstigatedBy, DamageCauser);
+	isDead = health <= 0;
+	if (isDead)
+	{
+		AMyGameModeBase* gm = Cast<AMyGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (gm)
+		{
+			gm->onActorKilled.Broadcast(DamagedActor, DamageCauser);
+		}
+	}
 }
 
 void UMyHealthComponent::OnRep_Health(float oldHealth)
