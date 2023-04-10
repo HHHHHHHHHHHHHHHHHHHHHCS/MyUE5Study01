@@ -47,7 +47,7 @@ void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UD
 		AMyGameModeBase* gm = Cast<AMyGameModeBase>(GetWorld()->GetAuthGameMode());
 		if (gm)
 		{
-			gm->onActorKilled.Broadcast(DamagedActor, DamageCauser);
+			gm->onActorKilled.Broadcast(GetOwner(), DamageCauser, InstigatedBy);
 		}
 	}
 }

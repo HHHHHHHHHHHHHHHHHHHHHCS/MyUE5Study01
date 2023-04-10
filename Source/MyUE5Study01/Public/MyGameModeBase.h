@@ -7,7 +7,7 @@
 #include "MyGameState.h"
 #include "MyGameModeBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActorKilled, AActor*, VictimActor, AActor*, killerActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnActorKilled, AActor*, VictimActor, AActor*, killerActor, AController*, killerController);
 
 UCLASS()
 class MYUE5STUDY01_API AMyGameModeBase : public AGameModeBase
@@ -20,7 +20,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="GameMode")
 	FOnActorKilled onActorKilled;
-	
+
 private:
 	FTimerHandle timerHandle_BotSpawner;
 	FTimerHandle timerHandle_NextWaveStart;
