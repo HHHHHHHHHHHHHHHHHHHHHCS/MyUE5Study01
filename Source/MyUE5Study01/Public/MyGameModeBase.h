@@ -60,4 +60,6 @@ public:
 	void CheckAnyPlayerAlive();
 
 	void SetWaveState(EWaveState newWaveState);
+
+	void RestartDeadPlayer();
 };

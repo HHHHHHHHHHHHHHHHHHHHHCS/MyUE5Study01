@@ -33,7 +33,7 @@ void AMyGameModeBase::StartWave()
 {
 	waveCount++;
 	botNumber = 2 * waveCount;
-	GetWorldTimerManager().SetTimer(timerHandle_BotSpawner, this, &AMyGameModeBase::SpawnNewBot, 1.0f, true, 0.0f);
+	GetWorldTimerManager().SetTimer(timerHandle_BotSpawner, this, &AMyGameModeBase::SpawnBotTimeElapsed, 1.0f, true, 0.0f);
 	SetWaveState(EWaveState::WaveInProgress);
 }
 
@@ -46,8 +46,9 @@ void AMyGameModeBase::EndWave()
 
 void AMyGameModeBase::PrepareNextWave()
 {
-	GetWorldTimerManager().SetTimer(timerHandle_NextWaveStart, this, &AMyGameModeBase::StartWave, betweenWaveTime, true);
+	GetWorldTimerManager().SetTimer(timerHandle_NextWaveStart, this, &AMyGameModeBase::StartWave, betweenWaveTime, false);
 	SetWaveState(EWaveState::WaitingToStart);
+	RestartDeadPlayer();
 }
 
 void AMyGameModeBase::SpawnBotTimeElapsed()
@@ -71,7 +72,7 @@ void AMyGameModeBase::CheckWaveState()
 	for (TActorIterator<APawn> it(GetWorld()); it; ++it)
 	{
 		APawn* pawn = *it;
-		if (pawn == nullptr || pawn->IsPawnControlled())
+		if (pawn == nullptr || pawn->IsPlayerControlled())
 		{
 			continue;
 		}
@@ -86,6 +87,7 @@ void AMyGameModeBase::CheckWaveState()
 	if (!isAnyBotAlive)
 	{
 		SetWaveState(EWaveState::WaveComplete);
+		PrepareNextWave();
 	}
 }
 
@@ -121,5 +123,17 @@ void AMyGameModeBase::SetWaveState(EWaveState newState)
 	if (ensureAlways(gs))
 	{
 		gs->SetWaveState(newState);
+	}
+}
+
+void AMyGameModeBase::RestartDeadPlayer()
+{
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+	{
+		APlayerController* pc = it->Get();
+		if (pc && pc->GetPawn() == nullptr)
+		{
+			RestartPlayer(pc);
+		}
 	}
 }
