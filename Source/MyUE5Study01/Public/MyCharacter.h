@@ -85,12 +85,15 @@ public:
 
 	virtual FVector GetPawnViewLocation() const override;
 
+	UFUNCTION(BlueprintCallable)
 	void StartFire();
 
+	UFUNCTION(BlueprintCallable)
 	void StopFire();
 
 	UFUNCTION()
-	void OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	void OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType,
+	                     AController* InstigatedBy, AActor* DamageCauser);
 
 private:
 	void BeginZoomFOV();
