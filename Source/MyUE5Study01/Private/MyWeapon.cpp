@@ -10,7 +10,8 @@
 #include "Net/UnrealNetwork.h"
 
 static int k_debugWeaponDrawing = 0;
-FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,TEXT("Draw debug weapon line."), ECVF_Cheat);
+FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,
+                                                TEXT("Draw debug weapon line."), ECVF_Cheat);
 
 // Sets default values
 AMyWeapon::AMyWeapon()
@@ -20,6 +21,7 @@ AMyWeapon::AMyWeapon()
 	traceEndName = "BeamEnd";
 	baseDamage = 20;
 	rateOfFire = 600.0f;
+	bulletSpread = 1.0f;
 	bReplicates = true;
 	SetReplicates(true);
 	//网络更新频率的设置
@@ -47,6 +49,9 @@ void AMyWeapon::Fire()
 		myOwner->GetActorEyesViewPoint(eyeLocation, eyeRotation);
 		FVector shotDirection = eyeRotation.Vector();
 		FVector traceEnd = eyeLocation + shotDirection * 10000;
+
+		float halfRad = FMath::DegreesToRadians(bulletSpread);
+		shotDirection = FMath::VRandCone(shotDirection, halfRad, halfRad);
 
 		FCollisionQueryParams params;
 		params.AddIgnoredActor(myOwner);
@@ -83,7 +88,8 @@ void AMyWeapon::Fire()
 			}
 			if (damage >= 0)
 			{
-				UGameplayStatics::ApplyPointDamage(hitActor, damage, shotDirection, hit, myOwner->GetInstigatorController(), this, damageType);
+				UGameplayStatics::ApplyPointDamage(hitActor, damage, shotDirection, hit,
+				                                   myOwner->GetInstigatorController(), this, damageType);
 				PlayImpactEffects(surfaceType, hit.Location);
 			}
 
@@ -117,7 +123,8 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 	if (traceEffect)
 	{
 		FVector muzzleLocation = skMeshComp->GetSocketLocation(muzzleSocketName);
-		UParticleSystemComponent* traceComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), traceEffect, muzzleLocation);
+		UParticleSystemComponent* traceComp = UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(), traceEffect, muzzleLocation);
 		if (traceComp)
 		{
 			traceComp->SetVectorParameter(traceEndName, traceEndPoint);
@@ -140,7 +147,8 @@ void AMyWeapon::PlayFireEffect(FVector traceEndPoint)
 void AMyWeapon::StartFire()
 {
 	float firstDelay = FMath::Max(lastFiredTime + timeBetweenShots - GetWorld()->TimeSeconds, 0);
-	GetWorldTimerManager().SetTimer(timerHandle_TimeBetweenShots, this, &AMyWeapon::Fire, timeBetweenShots, true, firstDelay);
+	GetWorldTimerManager().SetTimer(timerHandle_TimeBetweenShots, this, &AMyWeapon::Fire, timeBetweenShots, true,
+	                                firstDelay);
 }
 
 void AMyWeapon::StopFire()

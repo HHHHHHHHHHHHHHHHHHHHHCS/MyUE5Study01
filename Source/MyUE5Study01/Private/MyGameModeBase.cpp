@@ -10,7 +10,7 @@
 AMyGameModeBase::AMyGameModeBase()
 {
 	betweenWaveTime = 2.0f;
-	isAnyBotAlive = false;
+	isAnyBotAlive = true;
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 1.0f;
 	GameStateClass = AMyGameState::StaticClass();
