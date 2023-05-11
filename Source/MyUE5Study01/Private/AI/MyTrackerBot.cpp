@@ -77,12 +77,12 @@ void AMyTrackerBot::Tick(float DeltaTime)
 		forceDir.Normalize();
 		forceDir *= movementForce;
 		meshComp->AddForce(forceDir, NAME_None, useVelocityChange);
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100, 32, FColor::Red);
+		// DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100, 32, FColor::Red);
 	}
 	else
 	{
 		nextPathPoint = GetNextPathPoint();
-		DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
+		// DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
 	}
 	DrawDebugSphere(GetWorld(), nextPathPoint, 20, 12, FColor::Yellow);
 }

@@ -12,8 +12,33 @@ UMyHealthComponent::UMyHealthComponent()
 	defaultHealth = 100;
 	SetIsReplicated(true);
 	isDead = false;
+	teamNum = 255;
 }
 
+bool UMyHealthComponent::IsFriendly(AActor* actorA, AActor* actorB)
+{
+	if (actorA == nullptr || actorB == nullptr)
+	{
+		return true;
+	}
+
+	if (actorA == actorB)
+	{
+		return true;
+	}
+
+	UMyHealthComponent* healthA = Cast<UMyHealthComponent>(
+		actorA->GetComponentByClass(UMyHealthComponent::StaticClass()));
+	UMyHealthComponent* healthB = Cast<UMyHealthComponent>(
+		actorB->GetComponentByClass(UMyHealthComponent::StaticClass()));
+
+	if (healthA == nullptr || healthB == nullptr)
+	{
+		return true;
+	}
+
+	return healthA->teamNum == healthB->teamNum;
+}
 
 // Called when the game starts
 void UMyHealthComponent::BeginPlay()
@@ -32,9 +57,14 @@ void UMyHealthComponent::BeginPlay()
 	health = defaultHealth;
 }
 
-void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+void UMyHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+                                    AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (Damage <= 0 && isDead)
+	{
+		return;
+	}
+	if (IsFriendly(DamagedActor, DamageCauser))
 	{
 		return;
 	}

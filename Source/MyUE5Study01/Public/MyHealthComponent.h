@@ -6,9 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "MyHealthComponent.generated.h"
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSingnature, class UMyHealthComponent*, HealthComp, float, Health, float, HealthDelta, const class UDamageType*,
-                                             DamageType, class AController*, InstigatedBy, class AActor*, DamageCauser);
+// 这个强制换行后可能会报错
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSingnature, class UMyHealthComponent*, HealthComp, float, Health, float, HealthDelta, const class UDamageType*, DamageType, class AController*, InstigatedBy, class AActor*, DamageCauser);
 
 UCLASS(ClassGroup=(COOP), meta=(BlueprintSpawnableComponent))
 class MYUE5STUDY01_API UMyHealthComponent : public UActorComponent
@@ -18,6 +17,9 @@ class MYUE5STUDY01_API UMyHealthComponent : public UActorComponent
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
 	float defaultHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	uint8 teamNum;
 
 	UPROPERTY(BlueprintAssignable, Category="Events")
 	FOnHealthChangedSingnature onHealthChanged;
@@ -34,12 +36,16 @@ public:
 
 	FORCEINLINE float GetHealth() const { return health; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	static bool IsFriendly(AActor* actorA, AActor* actorB);
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, class AActor* DamageCauser);
+	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+	                        class AController* InstigatedBy, class AActor* DamageCauser);
 
 	UFUNCTION()
 	void OnRep_Health(float oldHealth);

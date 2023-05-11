@@ -89,7 +89,7 @@ void AMyWeapon::Fire()
 			if (damage >= 0)
 			{
 				UGameplayStatics::ApplyPointDamage(hitActor, damage, shotDirection, hit,
-				                                   myOwner->GetInstigatorController(), this, damageType);
+				                                   myOwner->GetInstigatorController(), GetOwner(), damageType);
 				PlayImpactEffects(surfaceType, hit.Location);
 			}
 
