@@ -66,7 +66,10 @@ private:
 
 	FTimerHandle timerHandle_damageSelf;
 
+	FTimerHandle timerHandle_refreshPath;
+	
 	bool isStartDamageSelf;
+
 	
 	
 protected:
@@ -81,6 +84,8 @@ public:
 
 	UFUNCTION()
 	void HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	void RefreshNextPath();
 
 	void DamageSelf();
 	

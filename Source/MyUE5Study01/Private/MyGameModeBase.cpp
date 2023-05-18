@@ -64,7 +64,7 @@ void AMyGameModeBase::SpawnBotTimeElapsed()
 void AMyGameModeBase::CheckWaveState()
 {
 	bool isPrepareWave = GetWorldTimerManager().IsTimerActive(timerHandle_NextWaveStart);
-	if (isPrepareWave && botNumber > 0)
+	if (isPrepareWave || botNumber > 0)
 	{
 		return;
 	}

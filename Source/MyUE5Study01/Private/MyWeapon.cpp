@@ -9,8 +9,8 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
 
-static int k_debugWeaponDrawing = 0;
-FAutoConsoleVariableRef ACVR_debugWeaponDrawing(TEXT("My.DebugWeapons"), k_debugWeaponDrawing,
+static int32 k_DebugWeaponDrawing = 0;
+FAutoConsoleVariableRef ACVR_DebugWeaponDrawing(TEXT("My.DebugWeapons"), k_DebugWeaponDrawing,
                                                 TEXT("Draw debug weapon line."), ECVF_Cheat);
 
 // Sets default values
@@ -96,7 +96,7 @@ void AMyWeapon::Fire()
 			traceEndPoint = hit.ImpactPoint;
 		}
 
-		if (k_debugWeaponDrawing > 0)
+		if (k_DebugWeaponDrawing > 0)
 		{
 			DrawDebugLine(GetWorld(), eyeLocation, traceEnd, FColor::White, false, 1.0f, 0.0, 1.0f);
 		}

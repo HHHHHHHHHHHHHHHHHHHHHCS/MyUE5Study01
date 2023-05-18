@@ -3,10 +3,15 @@
 
 #include "AI/MyTrackerBot.h"
 
+#include "EngineUtils.h"
 #include "MyCharacter.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
+
+static int32 k_DebugTrackBot = 0;
+FAutoConsoleVariableRef ACVR_DebugTrackBot(TEXT("My.DebugTrackBot"), k_DebugTrackBot,
+                                           TEXT("Draw debug track bot line."), ECVF_Cheat);
 
 // Sets default values
 AMyTrackerBot::AMyTrackerBot()
@@ -33,7 +38,7 @@ AMyTrackerBot::AMyTrackerBot()
 	requireDistanceToTarget = 100.0f;
 	isExploded = false;
 	explosionDamage = 40;
-	explosionRadius = 200;
+	explosionRadius = 350;
 
 	isStartDamageSelf = false;
 	selfDamageInterval = 0.5f;
@@ -51,14 +56,43 @@ void AMyTrackerBot::BeginPlay()
 
 FVector AMyTrackerBot::GetNextPathPoint()
 {
-	AMyCharacter* playerPawn = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-
-	UNavigationPath* navPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), playerPawn);
-
-	if (playerPawn && navPath && navPath->PathPoints.Num() > 1)
+	float nearestTargetDistance = MAX_FLT;
+	AActor* bestTarget = nullptr;
+	for (TActorIterator<APawn> it(GetWorld()); it; ++it)
 	{
-		return navPath->PathPoints[1];
+		APawn* pawn = *it;
+		if (pawn == nullptr || UMyHealthComponent::IsFriendly(pawn, this))
+		{
+			continue;
+		}
+
+		auto healthComp = Cast<UMyHealthComponent>(pawn->GetComponentByClass(UMyHealthComponent::StaticClass()));
+		if (healthComp && healthComp->GetHealth() > 0.0f)
+		{
+			float dist = FVector::Distance(pawn->GetActorLocation(), GetActorLocation());
+			if (dist < nearestTargetDistance)
+			{
+				nearestTargetDistance = dist;
+				bestTarget = pawn;
+			}
+		}
 	}
+
+	if (bestTarget)
+	{
+		UNavigationPath* navPath = UNavigationSystemV1::FindPathToActorSynchronously(
+			this, GetActorLocation(), bestTarget);
+
+		GetWorldTimerManager().ClearTimer(timerHandle_refreshPath);
+		GetWorldTimerManager().SetTimer(timerHandle_refreshPath, this, &AMyTrackerBot::RefreshNextPath,
+		                                5.0f, false);
+
+		if (navPath && navPath->PathPoints.Num() > 1)
+		{
+			return navPath->PathPoints[1];
+		}
+	}
+
 	return GetActorLocation();
 }
 
@@ -77,17 +111,28 @@ void AMyTrackerBot::Tick(float DeltaTime)
 		forceDir.Normalize();
 		forceDir *= movementForce;
 		meshComp->AddForce(forceDir, NAME_None, useVelocityChange);
-		// DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 100, 32, FColor::Red);
+		if (k_DebugTrackBot != 0)
+		{
+			DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(),
+			                          GetActorLocation() + GetActorForwardVector() * 100, 32, FColor::Red);
+		}
 	}
 	else
 	{
-		nextPathPoint = GetNextPathPoint();
-		// DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
+		RefreshNextPath();
+		if (k_DebugTrackBot != 0)
+		{
+			DrawDebugString(GetWorld(), GetActorLocation(), "Target Reached!");
+		}
 	}
-	DrawDebugSphere(GetWorld(), nextPathPoint, 20, 12, FColor::Yellow);
+	if (k_DebugTrackBot != 0)
+	{
+		DrawDebugSphere(GetWorld(), nextPathPoint, 20, 12, FColor::Yellow);
+	}
 }
 
-void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType, AController* InstigatedBy,
+void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Health, float HealthDelta,
+                                     const UDamageType* DamageType, AController* InstigatedBy,
                                      AActor* DamageCauser)
 {
 	// UE_LOG(LogTemp, Log, TEXT("Health %s of  %s"), *FString::SanitizeFloat(Health), *DamageCauser->GetName());
@@ -105,9 +150,15 @@ void AMyTrackerBot::HandleTakeDamage(UMyHealthComponent* HealthComp, float Healt
 	}
 }
 
+void AMyTrackerBot::RefreshNextPath()
+{
+	nextPathPoint = GetNextPathPoint();
+}
+
 void AMyTrackerBot::DamageSelf()
 {
 	UGameplayStatics::ApplyDamage(this, 20, GetInstigatorController(), this, nullptr);
+	SelfDestroy();
 }
 
 void AMyTrackerBot::SelfDestroy()
@@ -145,11 +196,12 @@ void AMyTrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 
 	AMyCharacter* character = Cast<AMyCharacter>(OtherActor);
-	if (character)
+	if (character && !UMyHealthComponent::IsFriendly(this, OtherActor))
 	{
 		if (GetLocalRole() == ROLE_Authority)
 		{
-			GetWorld()->GetTimerManager().SetTimer(timerHandle_damageSelf, this, &AMyTrackerBot::DamageSelf, selfDamageInterval, true, 0.0f);
+			GetWorldTimerManager().SetTimer(timerHandle_damageSelf, this, &AMyTrackerBot::DamageSelf,
+			                                selfDamageInterval, true, 0.0f);
 		}
 		isStartDamageSelf = true;
 		UGameplayStatics::SpawnSoundAttached(selfDestroyCue, RootComponent);
