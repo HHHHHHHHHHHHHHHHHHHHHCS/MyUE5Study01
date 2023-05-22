@@ -158,7 +158,6 @@ void AMyTrackerBot::RefreshNextPath()
 void AMyTrackerBot::DamageSelf()
 {
 	UGameplayStatics::ApplyDamage(this, 20, GetInstigatorController(), this, nullptr);
-	SelfDestroy();
 }
 
 void AMyTrackerBot::SelfDestroy()
