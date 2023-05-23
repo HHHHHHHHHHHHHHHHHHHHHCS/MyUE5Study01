@@ -49,6 +49,8 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, Category="UI")
 	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
+	float deadDuration;
+	
 protected:
 	UPROPERTY(Replicated)
 	AMyWeapon* currWeapon;
@@ -59,6 +61,8 @@ private:
 	float defaultFOV;
 
 	UMaterialInstanceDynamic* mat_img_health;
+
+	FTimerHandle dead_timerHandle;
 
 public:
 	// Sets default values for this character's properties
@@ -75,6 +79,8 @@ protected:
 	virtual void BeginCrouch();
 
 	virtual void EndCrouch();
+
+	virtual void CharacterDead();
 
 public:
 	// Called every frame

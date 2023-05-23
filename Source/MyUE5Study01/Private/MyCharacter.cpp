@@ -32,6 +32,8 @@ AMyCharacter::AMyCharacter()
 	healthComponent = CreateDefaultSubobject<UMyHealthComponent>(TEXT("HealthComp"));
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
+
+	deadDuration = 10;
 }
 
 // Called when the game starts or when spawned
@@ -48,9 +50,11 @@ void AMyCharacter::BeginPlay()
 		{
 			FActorSpawnParameters spawnParams;
 			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
+			currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator,
+			                                               spawnParams);
 			currWeapon->SetOwner(this);
-			currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weaponAttachSocketName);
+			currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			                              weaponAttachSocketName);
 		}
 	}
 
@@ -109,6 +113,13 @@ void AMyCharacter::BeginCrouch()
 void AMyCharacter::EndCrouch()
 {
 	UnCrouch();
+}
+
+void AMyCharacter::CharacterDead()
+{
+	Destroy();
+	currWeapon->Destroy();
+	EnableInput(GetLocalViewingPlayerController());
 }
 
 // Called every frame
@@ -180,8 +191,14 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 		StopFire();
 		GetMovementComponent()->StopMovementImmediately();
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		DetachFromControllerPendingDestroy();
-		SetLifeSpan(10.0f);
+		DisableInput(GetLocalViewingPlayerController());
+
+		if (healthComponent->teamNum != 255)
+		{
+			//玩家的死亡状态处理
+			GetWorldTimerManager().SetTimer(dead_timerHandle,this, &AMyCharacter::CharacterDead,
+				deadDuration, false);
+		}
 	}
 }
 
