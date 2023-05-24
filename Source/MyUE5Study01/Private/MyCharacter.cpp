@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "MyUE5Study01/MyUE5Study01.h"
 #include "Net/UnrealNetwork.h"
 
@@ -51,10 +52,10 @@ void AMyCharacter::BeginPlay()
 			FActorSpawnParameters spawnParams;
 			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			currWeapon = GetWorld()->SpawnActor<AMyWeapon>(defaultWeaponCls, FVector::ZeroVector, FRotator::ZeroRotator,
-			                                               spawnParams);
+															spawnParams);
 			currWeapon->SetOwner(this);
 			currWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,
-			                              weaponAttachSocketName);
+										weaponAttachSocketName);
 		}
 	}
 
@@ -176,7 +177,7 @@ void AMyCharacter::StopFire()
 }
 
 void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType*
-                                   DamageType, AController* InstigatedBy, AActor* DamageCauser)
+									DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (mat_img_health)
 	{
@@ -196,8 +197,17 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 		if (healthComponent->teamNum != 255)
 		{
 			//玩家的死亡状态处理
-			GetWorldTimerManager().SetTimer(dead_timerHandle,this, &AMyCharacter::CharacterDead,
-				deadDuration, false);
+			GetWorldTimerManager().SetTimer(dead_timerHandle, this, &AMyCharacter::CharacterDead,
+											deadDuration, false);
+		}
+		else
+		{
+			// 否则是敌人
+			if (deadEffect)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), deadEffect, GetActorTransform(), true);
+				CharacterDead();
+			}
 		}
 	}
 }

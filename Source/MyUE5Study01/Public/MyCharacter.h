@@ -40,8 +40,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
 	UMyHealthComponent* healthComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	float deadDuration;
+
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="Player")
 	bool bDied = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Player")
+	UParticleSystem* deadEffect;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadOnly, Category="UI")
 	TSubclassOf<UUserWidget> uiCrosshairsCls;
@@ -49,8 +55,6 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, Category="UI")
 	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
-	float deadDuration;
-	
 protected:
 	UPROPERTY(Replicated)
 	AMyWeapon* currWeapon;
@@ -99,7 +103,7 @@ public:
 
 	UFUNCTION()
 	void OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType,
-	                     AController* InstigatedBy, AActor* DamageCauser);
+						AController* InstigatedBy, AActor* DamageCauser);
 
 private:
 	void BeginZoomFOV();
