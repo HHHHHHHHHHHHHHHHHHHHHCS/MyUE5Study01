@@ -4,6 +4,7 @@
 #include "MyGameModeBase.h"
 
 #include "EngineUtils.h"
+#include "MyCharacter.h"
 #include "MyHealthComponent.h"
 #include "GameFramework/PlayerState.h"
 
@@ -134,6 +135,11 @@ void AMyGameModeBase::RestartDeadPlayer()
 		if (pc && pc->GetPawn() == nullptr)
 		{
 			RestartPlayer(pc);
+			AMyCharacter* myCharacter = Cast<AMyCharacter>(pc->GetPawn());
+			if(myCharacter)
+			{
+				myCharacter->ResetPlayer();
+			}
 		}
 	}
 }

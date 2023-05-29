@@ -64,7 +64,6 @@ void AMyCharacter::BeginPlay()
 		return;
 	}
 
-
 	bool isPlayer = false;
 	AController* ctrl = GetController();
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
@@ -79,20 +78,7 @@ void AMyCharacter::BeginPlay()
 
 	if (isPlayer)
 	{
-		if (uiCrosshairsCls)
-		{
-			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
-			widget->AddToViewport();
-		}
-
-		if (uiHealthIndicatorCls)
-		{
-			UUserWidget* widget = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
-			widget->AddToViewport();
-			UImage* ui_img_health = Cast<UImage>(widget->GetWidgetFromName(FName("Image_Health")));
-			mat_img_health = ui_img_health->GetDynamicMaterial();
-			mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
-		}
+		ResetPlayer();
 	}
 }
 
@@ -199,6 +185,8 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 			//玩家的死亡状态处理
 			GetWorldTimerManager().SetTimer(dead_timerHandle, this, &AMyCharacter::CharacterDead,
 											deadDuration, false);
+
+			RemoveInitUI();
 		}
 		else
 		{
@@ -212,6 +200,12 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 	}
 }
 
+void AMyCharacter::ResetPlayer()
+{
+	healthComponent->ResetHealth();
+	AddInitUI();
+}
+
 void AMyCharacter::BeginZoomFOV()
 {
 	bWantsToZoom = true;
@@ -220,6 +214,40 @@ void AMyCharacter::BeginZoomFOV()
 void AMyCharacter::EndZoomFOV()
 {
 	bWantsToZoom = false;
+}
+
+void AMyCharacter::AddInitUI()
+{
+	if (uiCrosshairsCls)
+	{
+		ui_crosshairs = CreateWidget<UUserWidget>(GetWorld(), uiCrosshairsCls);
+		ui_crosshairs->AddToViewport();
+	}
+
+	if (uiHealthIndicatorCls)
+	{
+		ui_healthIndicator = CreateWidget<UUserWidget>(GetWorld(), uiHealthIndicatorCls);
+		ui_healthIndicator->AddToViewport();
+		UImage* ui_img_health = Cast<UImage>(ui_healthIndicator->GetWidgetFromName(FName("Image_Health")));
+		mat_img_health = ui_img_health->GetDynamicMaterial();
+		mat_img_health->SetScalarParameterValue(FName("Alpha"), 1.0f);
+	}
+}
+
+void AMyCharacter::RemoveInitUI()
+{
+	if (ui_crosshairs)
+	{
+		ui_crosshairs->RemoveFromParent();
+		ui_crosshairs = nullptr;
+	}
+
+	if (ui_healthIndicator)
+	{
+		ui_healthIndicator->RemoveFromParent();
+		ui_healthIndicator = nullptr;
+		mat_img_health = nullptr;
+	}
 }
 
 void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

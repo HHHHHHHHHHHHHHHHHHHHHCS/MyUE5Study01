@@ -68,6 +68,9 @@ private:
 
 	FTimerHandle dead_timerHandle;
 
+	UUserWidget* ui_crosshairs;
+	UUserWidget* ui_healthIndicator;
+	
 public:
 	// Sets default values for this character's properties
 	AMyCharacter();
@@ -105,8 +108,14 @@ public:
 	void OnHealthChanged(UMyHealthComponent* HealthComp, float Health, float HealthDelta, const UDamageType* DamageType,
 						AController* InstigatedBy, AActor* DamageCauser);
 
+	void ResetPlayer();
+	
 private:
 	void BeginZoomFOV();
 
 	void EndZoomFOV();
+
+	void AddInitUI();
+
+	void RemoveInitUI();
 };

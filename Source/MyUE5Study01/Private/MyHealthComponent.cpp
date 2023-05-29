@@ -40,6 +40,11 @@ bool UMyHealthComponent::IsFriendly(AActor* actorA, AActor* actorB)
 	return healthA->teamNum == healthB->teamNum;
 }
 
+void UMyHealthComponent::ResetHealth()
+{
+	health = defaultHealth;
+}
+
 // Called when the game starts
 void UMyHealthComponent::BeginPlay()
 {
