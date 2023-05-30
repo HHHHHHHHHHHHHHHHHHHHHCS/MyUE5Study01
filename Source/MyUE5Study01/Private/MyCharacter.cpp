@@ -106,6 +106,7 @@ void AMyCharacter::CharacterDead()
 {
 	Destroy();
 	currWeapon->Destroy();
+	RemoveCrossUI();
 	EnableInput(GetLocalViewingPlayerController());
 }
 
@@ -186,7 +187,7 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 			GetWorldTimerManager().SetTimer(dead_timerHandle, this, &AMyCharacter::CharacterDead,
 											deadDuration, false);
 
-			RemoveInitUI();
+			RemoveHealthUI();
 		}
 		else
 		{
@@ -234,19 +235,22 @@ void AMyCharacter::AddInitUI()
 	}
 }
 
-void AMyCharacter::RemoveInitUI()
+void AMyCharacter::RemoveHealthUI()
 {
-	if (ui_crosshairs)
-	{
-		ui_crosshairs->RemoveFromParent();
-		ui_crosshairs = nullptr;
-	}
-
 	if (ui_healthIndicator)
 	{
 		ui_healthIndicator->RemoveFromParent();
 		ui_healthIndicator = nullptr;
 		mat_img_health = nullptr;
+	}
+}
+
+void AMyCharacter::RemoveCrossUI()
+{
+	if (ui_crosshairs)
+	{
+		ui_crosshairs->RemoveFromParent();
+		ui_crosshairs = nullptr;
 	}
 }
 

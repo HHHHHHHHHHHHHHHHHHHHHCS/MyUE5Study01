@@ -117,5 +117,7 @@ private:
 
 	void AddInitUI();
 
-	void RemoveInitUI();
+	void RemoveHealthUI();
+
+	void RemoveCrossUI();
 };
