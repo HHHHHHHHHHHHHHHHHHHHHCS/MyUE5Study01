@@ -55,6 +55,9 @@ public:
 	UPROPERTY(Replicated, EditAnywhere, Category="UI")
 	TSubclassOf<UUserWidget> uiHealthIndicatorCls;
 
+	UPROPERTY(Replicated, EditAnywhere, Category="Player")
+	TSubclassOf<UCameraShakeBase> hurtCameraShakeCls; 
+	
 protected:
 	UPROPERTY(Replicated)
 	AMyWeapon* currWeapon;

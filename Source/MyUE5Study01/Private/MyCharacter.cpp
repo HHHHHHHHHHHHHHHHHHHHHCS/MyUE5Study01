@@ -172,6 +172,24 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 		mat_img_health->SetScalarParameterValue(FName("Alpha"), val);
 	}
 
+	if (Health > 0 && HealthDelta > 0)
+	{
+		for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+		{
+			APlayerController* pc = it->Get();
+			if (pc && pc->GetPawn())
+			{
+				APawn* myPawn = pc->GetPawn();
+				UMyHealthComponent* healthComp = Cast<UMyHealthComponent>(myPawn->GetComponentByClass(UMyHealthComponent::StaticClass()));
+				if (ensure(healthComp) && healthComp->teamNum != 255)
+				{
+					pc->ClientStartCameraShake(hurtCameraShakeCls);
+				}
+			}
+		}
+	}
+
+
 	if (Health <= 0 && !bDied)
 	{
 		//处理死亡状态
