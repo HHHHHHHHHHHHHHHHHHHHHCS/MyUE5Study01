@@ -16,18 +16,34 @@ AMyGameModeBase::AMyGameModeBase()
 	PrimaryActorTick.TickInterval = 1.0f;
 	GameStateClass = AMyGameState::StaticClass();
 	PlayerStateClass = APlayerState::StaticClass();
+	isGameOver = false;
+	gameOverTime = 1800;
+	gameTime = gameOverTime;
 }
 
 void AMyGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 	PrepareNextWave();
+	if (gameOverTime > 0)
+	{
+		GetWorldTimerManager().SetTimer(timerHandle_GameOver, this, &AMyGameModeBase::CalcGameTime, 1, true, 0.5f);
+	}
 }
 
 void AMyGameModeBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	if(!isGameOver)
+	{
+		return;
+	}
 	CheckWaveState();
+	CheckAnyPlayerAlive();
+	if(gameTime<=0&&!isGameOver)
+	{
+		GameOver();
+	}
 }
 
 void AMyGameModeBase::StartWave()
@@ -94,8 +110,22 @@ void AMyGameModeBase::CheckWaveState()
 
 void AMyGameModeBase::GameOver()
 {
-	EndWave();
+	GetWorldTimerManager().ClearTimer(timerHandle_BotSpawner);
+	GetWorldTimerManager().ClearTimer(timerHandle_NextWaveStart);
+	GetWorldTimerManager().ClearTimer(timerHandle_GameOver);
 	SetWaveState(EWaveState::GameOver);
+	OnGameOver();
+	for(auto it = GetWorld()->GetPlayerControllerIterator();it;++it)
+	{
+		auto* pc = it->Get();
+		if(pc)
+		{
+			AMyCharacter* myChar = Cast<AMyCharacter>(pc->GetPawn());
+			myChar->SetStopState();
+			pc->bShowMouseCursor = true;
+		}
+	}
+	isGameOver = true;
 }
 
 void AMyGameModeBase::CheckAnyPlayerAlive()
@@ -136,10 +166,15 @@ void AMyGameModeBase::RestartDeadPlayer()
 		{
 			RestartPlayer(pc);
 			AMyCharacter* myCharacter = Cast<AMyCharacter>(pc->GetPawn());
-			if(myCharacter)
+			if (myCharacter)
 			{
 				myCharacter->ResetPlayer();
 			}
 		}
 	}
+}
+
+void AMyGameModeBase::CalcGameTime()
+{
+	gameTime--;
 }

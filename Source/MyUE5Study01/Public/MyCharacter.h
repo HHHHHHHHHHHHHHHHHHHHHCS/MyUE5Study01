@@ -112,6 +112,10 @@ public:
 						AController* InstigatedBy, AActor* DamageCauser);
 
 	void ResetPlayer();
+
+	void SetStopState();
+
+	void SetResumeState();
 	
 private:
 	void BeginZoomFOV();

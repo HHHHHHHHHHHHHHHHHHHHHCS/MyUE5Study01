@@ -21,15 +21,24 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GameMode")
 	FOnActorKilled onActorKilled;
 
+	UPROPERTY(EditDefaultsOnly, Category="GameMode", meta = (ClampMin = 0, ClampMax = 3600))
+	int32 gameOverTime;
+
+	UPROPERTY(BlueprintReadOnly, Category="GameMode")
+	int32 gameTime;
+
 private:
 	FTimerHandle timerHandle_BotSpawner;
 	FTimerHandle timerHandle_NextWaveStart;
+	FTimerHandle timerHandle_GameOver;
 
 	int waveCount;
 
 	int botNumber;
 
 	bool isAnyBotAlive;
+
+	bool isGameOver;
 
 public:
 	AMyGameModeBase();
@@ -62,4 +71,9 @@ public:
 	void SetWaveState(EWaveState newWaveState);
 
 	void RestartDeadPlayer();
+
+	void CalcGameTime();
+
+	UFUNCTION(BlueprintImplementableEvent, Category="GameMode")
+	void OnGameOver();
 };

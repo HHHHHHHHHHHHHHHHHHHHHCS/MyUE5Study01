@@ -195,9 +195,8 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 		//处理死亡状态
 		bDied = true;
 		StopFire();
-		GetMovementComponent()->StopMovementImmediately();
-		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		DisableInput(GetLocalViewingPlayerController());
+
+		SetStopState();
 
 		if (healthComponent->teamNum != 255)
 		{
@@ -223,6 +222,19 @@ void AMyCharacter::ResetPlayer()
 {
 	healthComponent->ResetHealth();
 	AddInitUI();
+}
+
+void AMyCharacter::SetStopState()
+{
+	GetMovementComponent()->StopMovementImmediately();
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DisableInput(GetLocalViewingPlayerController());
+}
+
+void AMyCharacter::SetResumeState()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	EnableInput(GetLocalViewingPlayerController());
 }
 
 void AMyCharacter::BeginZoomFOV()
