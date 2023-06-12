@@ -18,12 +18,12 @@ AMyGameModeBase::AMyGameModeBase()
 	PlayerStateClass = APlayerState::StaticClass();
 	isGameOver = false;
 	gameOverTime = 1800;
-	gameTime = gameOverTime;
 }
 
 void AMyGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+	gameTime = gameOverTime;
 	PrepareNextWave();
 	if (gameOverTime > 0)
 	{
