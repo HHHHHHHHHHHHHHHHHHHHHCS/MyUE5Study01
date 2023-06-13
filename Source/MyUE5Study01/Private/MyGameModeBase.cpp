@@ -34,13 +34,13 @@ void AMyGameModeBase::StartPlay()
 void AMyGameModeBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if(!isGameOver)
+	if (isGameOver)
 	{
 		return;
 	}
 	CheckWaveState();
 	CheckAnyPlayerAlive();
-	if(gameTime<=0&&!isGameOver)
+	if (gameTime <= 0 && !isGameOver)
 	{
 		GameOver();
 	}
@@ -115,10 +115,10 @@ void AMyGameModeBase::GameOver()
 	GetWorldTimerManager().ClearTimer(timerHandle_GameOver);
 	SetWaveState(EWaveState::GameOver);
 	OnGameOver();
-	for(auto it = GetWorld()->GetPlayerControllerIterator();it;++it)
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
 	{
 		auto* pc = it->Get();
-		if(pc)
+		if (pc)
 		{
 			AMyCharacter* myChar = Cast<AMyCharacter>(pc->GetPawn());
 			myChar->SetStopState();

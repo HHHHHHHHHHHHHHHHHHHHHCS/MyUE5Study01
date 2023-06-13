@@ -22,10 +22,10 @@ public:
 	FOnActorKilled onActorKilled;
 
 	UPROPERTY(EditDefaultsOnly, Category="GameMode", meta = (ClampMin = 0, ClampMax = 3600))
-	int32 gameOverTime;
+	int gameOverTime;
 
 	UPROPERTY(BlueprintReadOnly, Category="GameMode")
-	int32 gameTime;
+	int gameTime;
 
 private:
 	FTimerHandle timerHandle_BotSpawner;
