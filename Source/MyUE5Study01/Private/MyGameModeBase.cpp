@@ -178,3 +178,34 @@ void AMyGameModeBase::CalcGameTime()
 {
 	gameTime--;
 }
+
+void AMyGameModeBase::GameRestart()
+{
+	SetWaveState(EWaveState::GameRestart);
+	for (auto it = GetWorld()->GetPlayerControllerIterator(); it; ++it)
+	{
+		APlayerController* pc = it->Get();
+		if (pc && pc->GetPawn() == nullptr)
+		{
+			RestartPlayer(pc);
+			AMyCharacter* myCharacter = Cast<AMyCharacter>(pc->GetPawn());
+			if (myCharacter)
+			{
+				myCharacter->ResetPlayer();
+			}
+		}
+		else
+		{
+			AMyCharacter* myCharacter = Cast<AMyCharacter>(pc->GetPawn());
+			myCharacter->SetResumeState();
+			if (myCharacter)
+			{
+				myCharacter->ResetPlayer();
+			}
+		}
+		pc->GetPawn()->GetPlayerState()->SetScore(0);
+		pc->bShowMouseCursor = false;
+	}
+	isGameOver = false;
+	StartPlay();
+}

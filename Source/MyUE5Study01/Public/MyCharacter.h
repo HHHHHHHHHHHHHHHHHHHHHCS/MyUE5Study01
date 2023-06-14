@@ -116,6 +116,8 @@ public:
 	void SetStopState();
 
 	void SetResumeState();
+
+	void StopDeadState();
 	
 private:
 	void BeginZoomFOV();

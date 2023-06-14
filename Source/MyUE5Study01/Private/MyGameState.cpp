@@ -20,6 +20,11 @@ void AMyGameState::SetWaveState(EWaveState newState)
 	}
 }
 
+EWaveState AMyGameState::GetWaveState()
+{
+	return waveState;
+}
+
 
 void AMyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

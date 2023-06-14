@@ -76,4 +76,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category="GameMode")
 	void OnGameOver();
+
+	UFUNCTION(BlueprintCallable, Category="GameMode")
+	void GameRestart();
 };

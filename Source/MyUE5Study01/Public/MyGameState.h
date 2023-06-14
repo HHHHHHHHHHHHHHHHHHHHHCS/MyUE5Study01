@@ -15,6 +15,7 @@ enum class EWaveState : uint8
 	WaitingToComplete,
 	WaveComplete,
 	GameOver,
+	GameRestart,
 };
 
 /**
@@ -37,4 +38,6 @@ public:
 	void WaveStateChanged(EWaveState newState, EWaveState oldState);
 
 	void SetWaveState(EWaveState newState);
+
+	EWaveState GetWaveState();
 };

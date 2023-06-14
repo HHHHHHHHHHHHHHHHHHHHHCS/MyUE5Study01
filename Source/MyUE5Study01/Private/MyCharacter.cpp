@@ -2,6 +2,9 @@
 
 
 #include "MyCharacter.h"
+
+#include "MyGameModeBase.h"
+#include "MyGameState.h"
 #include "Components/CapsuleComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
@@ -198,13 +201,22 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 
 		SetStopState();
 
+		AMyGameState* gameState = GetWorld()->GetGameState<AMyGameState>();
+
 		if (healthComponent->teamNum != 255)
 		{
-			//玩家的死亡状态处理
-			GetWorldTimerManager().SetTimer(dead_timerHandle, this, &AMyCharacter::CharacterDead,
-											deadDuration, false);
+			if (gameState->GetWaveState() == EWaveState::GameRestart)
+			{
+				CharacterDead();
+			}
+			else
+			{
+				//玩家的死亡状态处理
+				GetWorldTimerManager().SetTimer(dead_timerHandle, this, &AMyCharacter::CharacterDead,
+												deadDuration, false);
 
-			RemoveHealthUI();
+				RemoveHealthUI();
+			}
 		}
 		else
 		{
@@ -220,12 +232,14 @@ void AMyCharacter::OnHealthChanged(UMyHealthComponent* HealthComp, float Health,
 
 void AMyCharacter::ResetPlayer()
 {
+	StopDeadState();
 	healthComponent->ResetHealth();
 	AddInitUI();
 }
 
 void AMyCharacter::SetStopState()
 {
+	cameraComp->SetFieldOfView(defaultFOV);
 	GetMovementComponent()->StopMovementImmediately();
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	DisableInput(GetLocalViewingPlayerController());
@@ -233,8 +247,17 @@ void AMyCharacter::SetStopState()
 
 void AMyCharacter::SetResumeState()
 {
+	cameraComp->SetFieldOfView(defaultFOV);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	EnableInput(GetLocalViewingPlayerController());
+}
+
+void AMyCharacter::StopDeadState()
+{
+	if(GetWorld()->GetTimerManager().TimerExists(dead_timerHandle))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(dead_timerHandle);
+	}
 }
 
 void AMyCharacter::BeginZoomFOV()
