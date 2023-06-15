@@ -193,17 +193,18 @@ void AMyGameModeBase::GameRestart()
 			{
 				myCharacter->ResetPlayer();
 			}
+			pc->GetPawn()->GetPlayerState()->SetScore(0);
 		}
 		else
 		{
 			AMyCharacter* myCharacter = Cast<AMyCharacter>(pc->GetPawn());
+			pc->GetPawn()->GetPlayerState()->SetScore(0);
 			myCharacter->SetResumeState();
 			if (myCharacter)
 			{
 				myCharacter->ResetPlayer();
 			}
 		}
-		pc->GetPawn()->GetPlayerState()->SetScore(0);
 		pc->bShowMouseCursor = false;
 	}
 	isGameOver = false;
